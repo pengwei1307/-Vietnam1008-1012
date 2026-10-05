@@ -47,14 +47,25 @@
   }
   .serif{ font-family:"Songti TC","Noto Serif TC","Source Han Serif TC","PMingLiU",serif; }
 
-  /* 整頁水彩背景（bg.jpg），固定不動，內容在上面捲動 */
+  /* 整頁水彩背景（bg.jpg）：跟橫幅一樣依螢幕寬度縮放，固定不動。
+     上方花草貼齊頂端、下方街景貼齊底部，中間用紙色補滿，任何螢幕比例都完整好看 */
   .bgart{
     position:fixed; inset:0; z-index:0; pointer-events:none;
-    background:var(--bgc) url('bg.jpg') center center / cover no-repeat;
+    background:var(--bgc);
   }
-  /* 電腦等橫向螢幕：整張圖完整顯示在中間，兩側用紙色補滿 */
-  @media (min-aspect-ratio: 3/4){
-    .bgart{ background-size:auto 100%; }
+  .bgart::before, .bgart::after{
+    content:''; position:absolute; inset:0;
+    background:url('bg.jpg') no-repeat; background-size:100% auto;
+  }
+  .bgart::before{
+    background-position:center top;
+    -webkit-mask-image:linear-gradient(180deg, #000 0, #000 45vw, transparent 66vw);
+            mask-image:linear-gradient(180deg, #000 0, #000 45vw, transparent 66vw);
+  }
+  .bgart::after{
+    background-position:center bottom;
+    -webkit-mask-image:linear-gradient(0deg, #000 0, #000 74vw, transparent 92vw);
+            mask-image:linear-gradient(0deg, #000 0, #000 74vw, transparent 92vw);
   }
   .banner{ width:100%; aspect-ratio:1290/830; overflow:hidden; position:relative; }
   /* 橫幅下緣漸漸變透明，直接溶進背景圖 */
