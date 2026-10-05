@@ -423,46 +423,50 @@
         </div>
       </div>
 
-      <!-- 包車 -->
+      <!-- 包車（可編輯） -->
       <div class="card p-4">
-        <h2 class="serif text-[19px] mb-3">包車</h2>
-        <div v-for="c in cars" :key="c.date" class="flex gap-3 py-2.5 border-b border-[rgba(61,74,71,.08)] last:border-0 last:pb-0">
-          <div class="w-12 shrink-0 text-center rounded-xl bg-[#E2E9EE] py-1.5">
-            <div class="text-[11px] text-ink2">{{ c.dow }}</div><div class="serif text-[15px]">{{ c.date }}</div>
-          </div>
-          <div class="min-w-0">
-            <div class="text-[14.5px]">{{ c.from }} → {{ c.to }}</div>
-            <div class="text-[12.5px] text-ink2 mt-0.5">{{ c.note }}</div>
-          </div>
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="serif text-[19px]">包車</h2>
+          <button @click="need() && editInfo('car', null)" class="text-[13px] text-[#7D9E88] px-2 py-1">＋ 新增</button>
         </div>
+        <div v-for="c in sortedCars" :key="c.id" class="flex gap-3 py-2.5 border-b border-[rgba(61,74,71,.08)] last:border-0 last:pb-0">
+          <div class="w-12 shrink-0 text-center rounded-xl bg-[#E2E9EE] py-1.5 self-start">
+            <div class="text-[11px] text-ink2">{{ dayOf(c.date).dow }}</div><div class="serif text-[15px]">{{ dayOf(c.date).md }}</div>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="text-[14.5px]">{{ c.from }} → {{ c.to }}</div>
+            <div class="text-[12.5px] text-ink2 mt-0.5" v-if="c.time || c.contact">
+              <span v-if="c.time">🕘 {{ c.time }}</span><span v-if="c.time && c.contact">　</span>
+              <a v-if="c.contact" :href="'tel:' + c.contact.replace(/[^0-9+]/g, '')" class="underline">☎ {{ c.contact }}</a>
+            </div>
+            <div class="text-[12.5px] text-ink2 mt-0.5 whitespace-pre-line" v-if="c.note">{{ c.note }}</div>
+          </div>
+          <button v-if="isEditor" @click="editInfo('car', c)" class="text-ink2/60 p-1 shrink-0 self-start" aria-label="編輯" v-html="icons.pen"></button>
+        </div>
+        <p v-if="!cars.length" class="text-[13px] text-ink2 py-2">還沒有包車資訊。</p>
       </div>
 
-      <!-- 預約 -->
+      <!-- 預約（可編輯） -->
       <div class="card p-4">
-        <h2 class="serif text-[19px] mb-3">預約</h2>
-        <div class="py-1">
-          <div class="flex justify-between items-baseline gap-2">
-            <span class="serif text-[16px]">奧黛租借＋妝髮＋外拍</span>
-            <span class="text-[12px] text-ink2 shrink-0">10/11（日）</span>
-          </div>
-          <div class="text-[13px] text-ink2 mt-1 leading-relaxed">
-            08:00–10:00 選奧黛、妝髮<br>10:00 外出拍照（約 1.5 小時）<br>衣服當天下午 5 點前或隔天歸還
-          </div>
-          <div class="grid grid-cols-3 gap-2 mt-2.5 text-center">
-            <div class="rounded-xl bg-white/80 border border-[rgba(61,74,71,.08)] py-2"><div class="text-[11.5px] text-ink2">總金額</div><div class="text-[13.5px]">7,300,000₫</div></div>
-            <div class="rounded-xl bg-white/80 border border-[rgba(61,74,71,.08)] py-2"><div class="text-[11.5px] text-ink2">已付訂金</div><div class="text-[13.5px]">4,900,000₫</div><div class="text-[11px] text-ink2">NT$6,203</div></div>
-            <div class="rounded-xl bg-[#F2DEE3] py-2"><div class="text-[11.5px] text-ink2">尾款付現</div><div class="text-[13.5px]">2,900,000₫</div></div>
-          </div>
-          <a href="https://maps.app.goo.gl/2ZNkfM9EAgavtAdM7" target="_blank" class="inline-block mt-2.5 px-3 py-1.5 rounded-full bg-[#7D9E88] text-white text-[13px]">店家位置</a>
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="serif text-[19px]">預約</h2>
+          <button @click="need() && editInfo('book', null)" class="text-[13px] text-[#7D9E88] px-2 py-1">＋ 新增</button>
         </div>
-        <div class="pt-3 mt-3 border-t border-[rgba(61,74,71,.08)]">
-          <div class="flex justify-between items-baseline gap-2">
-            <span class="serif text-[16px]">Pizza 4P's 晚餐</span>
-            <span class="text-[12px] text-ink2 shrink-0">10/11（日）</span>
+        <div v-for="k in sortedBooks" :key="k.id" class="py-3 border-b border-[rgba(61,74,71,.08)] last:border-0 last:pb-0">
+          <div class="flex justify-between items-start gap-2">
+            <span class="serif text-[16px] flex-1 min-w-0">{{ k.title }}</span>
+            <span class="text-[12px] text-ink2 shrink-0 mt-0.5">{{ dayOf(k.date).md }}（{{ dayOf(k.date).zh }}）<span v-if="k.time"> {{ k.time }}</span></span>
+            <button v-if="isEditor" @click="editInfo('book', k)" class="text-ink2/60 p-1 -mt-1 shrink-0" aria-label="編輯" v-html="icons.pen"></button>
           </div>
-          <div class="text-[13px] text-ink2 mt-1">18:30　4 位</div>
-          <a href="https://maps.app.goo.gl/9k9K74R5KcHg7Y6E6" target="_blank" class="inline-block mt-2.5 px-3 py-1.5 rounded-full bg-[#7D9E88] text-white text-[13px]">餐廳位置</a>
+          <div class="text-[13px] text-ink2 mt-1 leading-relaxed whitespace-pre-line" v-if="k.detail">{{ k.detail }}</div>
+          <div class="grid grid-cols-3 gap-2 mt-2.5 text-center" v-if="k.total || k.paid || k.remain">
+            <div class="rounded-xl bg-white/80 border border-[rgba(61,74,71,.08)] py-2 px-1"><div class="text-[11.5px] text-ink2">總金額</div><div class="text-[13px] break-all">{{ k.total || '—' }}</div></div>
+            <div class="rounded-xl bg-white/80 border border-[rgba(61,74,71,.08)] py-2 px-1"><div class="text-[11.5px] text-ink2">已付</div><div class="text-[13px] break-all">{{ k.paid || '—' }}</div></div>
+            <div class="rounded-xl bg-[#F2DEE3] py-2 px-1"><div class="text-[11.5px] text-ink2">尚需付</div><div class="text-[13px] break-all">{{ k.remain || '—' }}</div></div>
+          </div>
+          <a v-if="k.url" :href="k.url" target="_blank" class="inline-block mt-2.5 px-3 py-1.5 rounded-full bg-[#7D9E88] text-white text-[13px]">查看位置</a>
         </div>
+        <p v-if="!books.length" class="text-[13px] text-ink2 py-2">還沒有預約資訊。</p>
       </div>
 
       <!-- 交通小提醒 -->
@@ -546,22 +550,48 @@
 
     <!-- ---------- 4. 花費 ---------- -->
     <section v-if="tab==='cost'" class="px-4 pt-2">
-      <div class="card p-5 mb-5 text-center">
-        <div class="text-[13px] text-ink2">總花費</div>
-        <div class="serif text-[34px] mt-1">{{ total.toLocaleString() }} ₫</div>
-        <div class="text-[13px] text-ink2 mt-1">約 NT$ {{ Math.round(total*rate).toLocaleString() }}</div>
+      <div class="card p-5 mb-4 text-center">
+        <div class="text-[13px] text-ink2">總花費（換算台幣）</div>
+        <div class="serif text-[34px] mt-1">NT$ {{ Math.round(totalTwd).toLocaleString() }}</div>
+        <div class="text-[13px] text-ink2 mt-1">≈ {{ Math.round(totalTwd / rate).toLocaleString() }} ₫　·　共 {{ costs.length }} 筆</div>
       </div>
 
-      <div v-for="c in costs" :key="c.id" class="card p-3.5 mb-2.5 flex items-center gap-3" @click="need() && editCost(c)">
+      <!-- 分帳結算 -->
+      <div class="card p-4 mb-5" v-if="settle.people.length">
+        <h2 class="serif text-[18px] mb-2.5">分帳結算</h2>
+        <div v-for="x in settle.people" :key="x.id" class="flex items-center gap-2.5 py-1.5">
+          <img v-if="memberOf(x.id) && memberOf(x.id).avatar" :src="memberOf(x.id).avatar" class="avatar w-7 h-7">
+          <span v-else class="avatar w-7 h-7 text-[12px]" :style="{background:colorOf(x.id)}">{{ nameOf(x.id).slice(0,1) }}</span>
+          <div class="flex-1 min-w-0 text-[13.5px]">{{ nameOf(x.id) }}
+            <div class="text-[11.5px] text-ink2">付了 NT${{ Math.round(x.paid).toLocaleString() }}　應分攤 NT${{ Math.round(x.share).toLocaleString() }}</div>
+          </div>
+          <div class="text-[13.5px] shrink-0" :style="{color: x.net >= 0 ? '#5B7A64' : '#C0736F'}">
+            {{ Math.abs(Math.round(x.net)) < 1 ? '已平衡' : (x.net > 0 ? '應收 ' : '應付 ') + 'NT$' + Math.abs(Math.round(x.net)).toLocaleString() }}
+          </div>
+        </div>
+        <div v-if="settle.moves.length" class="dashed mt-2.5 pt-2.5 space-y-1.5">
+          <div class="text-[12.5px] text-ink2">怎麼還最簡單：</div>
+          <div v-for="(m, i) in settle.moves" :key="i" class="text-[14px]">
+            {{ nameOf(m.from) }} → {{ nameOf(m.to) }}　<span class="serif">NT$ {{ m.amt.toLocaleString() }}</span>
+            <span class="text-[12px] text-ink2">（≈ {{ Math.round(m.amt / rate / 1000).toLocaleString() }}K ₫）</span>
+          </div>
+        </div>
+      </div>
+
+      <div v-for="c in costs" :key="c.id" class="card p-3.5 mb-2.5 flex items-start gap-3" @click="need() && editCost(c)">
         <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
              :style="{background:catBg(c.cat)}" v-html="catIcon(c.cat)"></div>
         <div class="flex-1 min-w-0">
           <div class="text-[15px] truncate">{{ c.name }}</div>
-          <div class="text-[12.5px] text-ink2 mt-0.5">{{ c.date }}　{{ c.cat }}　{{ c.pay }}<span v-if="c.note">　{{ c.note }}</span></div>
+          <div class="text-[12.5px] text-ink2 mt-0.5">{{ c.date.slice(5) }}　{{ c.cat }}　{{ c.pay }}<span v-if="c.note">　{{ c.note }}</span></div>
+          <div class="text-[12.5px] mt-1" v-if="c.payer">
+            <span class="text-[#5B7A64]">{{ nameOf(c.payer) }} 付</span>
+            <span class="text-ink2" v-if="c.for && c.for.length">　幫 {{ forText(c.for) }}</span>
+          </div>
         </div>
         <div class="text-right shrink-0">
-          <div class="serif text-[17px]">{{ Number(c.amt).toLocaleString() }}₫</div>
-          <div class="text-[11.5px] text-ink2">≈ NT${{ Math.round(c.amt*rate).toLocaleString() }}</div>
+          <div class="serif text-[17px]">{{ money(c.amt, c.cur) }}</div>
+          <div class="text-[11.5px] text-ink2">≈ {{ (c.cur || 'VND') === 'TWD' ? Math.round(c.amt / rate).toLocaleString() + '₫' : 'NT$' + Math.round(c.amt * rate).toLocaleString() }}</div>
         </div>
       </div>
       <p v-if="!costs.length" class="text-center text-ink2 text-[14px] py-12">還沒有記錄。花錢之後按加號記一筆。</p>
@@ -694,11 +724,31 @@
         <div class="grid grid-cols-2 gap-3">
           <div><label class="fld">日期</label>
             <select v-model="cform.date"><option v-for="d in days" :key="d.date" :value="d.date">{{ d.date.slice(5) }}（{{ d.zh }}）</option></select></div>
-          <div><label class="fld">金額（越南盾）</label><input type="number" inputmode="numeric" v-model="cform.amt" placeholder="0">
-            <div class="text-[12px] text-ink2 mt-1" v-if="cform.amt">≈ NT$ {{ Math.round(cform.amt*rate).toLocaleString() }}</div></div>
+          <div><label class="fld">付款方式</label>
+            <select v-model="cform.pay"><option>現金</option><option>信用卡</option></select></div>
         </div>
-        <div><label class="fld">付款方式</label>
-          <select v-model="cform.pay"><option>現金</option><option>信用卡</option></select></div>
+        <div><label class="fld">金額</label>
+          <div class="flex gap-2">
+            <input type="number" inputmode="decimal" v-model="cform.amt" placeholder="0" class="flex-1">
+            <div class="flex rounded-xl overflow-hidden border border-[rgba(61,74,71,.12)] shrink-0">
+              <button type="button" @click="cform.cur='VND'" class="px-3 text-[14px]" :class="cform.cur==='VND' ? 'bg-[#7D9E88] text-white' : 'bg-white'">₫ 越南盾</button>
+              <button type="button" @click="cform.cur='TWD'" class="px-3 text-[14px]" :class="cform.cur==='TWD' ? 'bg-[#7D9E88] text-white' : 'bg-white'">NT$</button>
+            </div>
+          </div>
+          <div class="text-[12px] text-ink2 mt-1" v-if="cform.amt">≈ {{ cform.cur==='TWD' ? Math.round(cform.amt / rate).toLocaleString() + ' ₫' : 'NT$ ' + Math.round(cform.amt * rate).toLocaleString() }}</div>
+        </div>
+        <div v-if="members.length"><label class="fld">誰付的錢</label>
+          <select v-model="cform.payer"><option value="">（不記錄）</option><option v-for="m in members" :key="m.id" :value="m.id">{{ m.name }}</option></select></div>
+        <div v-if="members.length && cform.payer">
+          <div class="flex items-center justify-between"><label class="fld !mb-0">幫哪些人付（分攤的人）</label>
+            <button type="button" @click="cform.for = cform.for.length === members.length ? [] : members.map(function (m) { return m.id; })" class="text-[12.5px] text-[#7D9E88]">{{ cform.for.length === members.length ? '全部取消' : '全選' }}</button></div>
+          <div class="flex flex-wrap gap-2 mt-1.5">
+            <button type="button" v-for="m in members" :key="m.id" @click="toggleFor(m.id)"
+                    class="px-3 py-1.5 rounded-full text-[13.5px] border"
+                    :class="cform.for.indexOf(m.id) >= 0 ? 'bg-[#7D9E88] text-white border-transparent' : 'bg-white border-[rgba(61,74,71,.15)] text-ink2'">{{ m.name }}</button>
+          </div>
+          <div class="text-[12px] text-ink2 mt-1.5" v-if="cform.amt && cform.for.length">每人分攤約 {{ money(Math.round(cform.amt / cform.for.length * 100) / 100, cform.cur) }}</div>
+        </div>
         <div><label class="fld">備註</label><input v-model="cform.note"></div>
       </div>
       <div class="flex gap-3 mt-6">
@@ -805,17 +855,89 @@
         </div>
         <button v-if="me" @click="logout()" class="w-full mt-3 py-3 rounded-2xl bg-[#F3F1EA] text-ink2">登出（變回只能瀏覽）</button>
 
-        <div v-if="members.length" class="mt-6">
-          <div class="text-[12.5px] text-ink2 mb-2">旅伴們</div>
-          <div class="flex flex-wrap gap-3">
-            <div v-for="m in members" :key="m.id" class="w-14 flex flex-col items-center">
-              <img v-if="m.avatar" :src="m.avatar" class="avatar w-11 h-11">
-              <span v-else class="avatar w-11 h-11 serif text-[17px]" :style="{background:colorOf(m.id)}">{{ m.name.slice(0,1) }}</span>
-              <span class="text-[11.5px] mt-1 w-full truncate text-center">{{ m.name }}</span>
+        <div v-if="members.length && me" class="mt-6">
+          <div class="text-[12.5px] text-ink2 mb-2">旅伴們 <span v-if="isAdmin">（你是主要編輯者，可以管理成員）</span></div>
+          <div v-for="m in members" :key="m.id" class="flex items-center gap-2.5 py-2 border-b border-[rgba(61,74,71,.08)] last:border-0">
+            <img v-if="m.avatar" :src="m.avatar" class="avatar w-9 h-9">
+            <span v-else class="avatar w-9 h-9 serif text-[15px]" :style="{background:colorOf(m.id)}">{{ m.name.slice(0,1) }}</span>
+            <div class="flex-1 min-w-0 text-[14px] truncate">{{ m.name }}
+              <span v-if="isAdminId(m.id)" class="ml-1 text-[11px] px-1.5 py-0.5 rounded-md bg-[#F3E4D8]">主要編輯者</span>
+              <span v-if="m.id===meId" class="ml-1 text-[11px] text-ink2">（你）</span>
+            </div>
+            <template v-if="isAdmin && m.id!==meId">
+              <button @click="toggleAdmin(m)" class="text-[12px] px-2 py-1 rounded-lg bg-white border border-[rgba(61,74,71,.12)] shrink-0">{{ isAdminId(m.id) ? '取消主編' : '設為主編' }}</button>
+              <button @click="askDelMember=m" class="text-[12px] px-2 py-1 rounded-lg bg-[#F7ECEA] text-[#C0736F] shrink-0">移除</button>
+            </template>
+          </div>
+          <div v-if="!isAdmin" class="mt-4">
+            <button v-if="!mform.showAdmin" @click="mform.showAdmin=true" class="text-[12.5px] text-ink2 underline">我是主要編輯者（輸入管理密碼）</button>
+            <div v-else class="flex gap-2">
+              <input v-model="mform.adminPin" type="password" inputmode="numeric" maxlength="8" placeholder="管理密碼" class="flex-1">
+              <button @click="claimAdmin()" class="px-4 rounded-xl bg-[#7D9E88] text-white text-[14px] shrink-0">確認</button>
             </div>
           </div>
         </div>
       </template>
+    </div>
+  </div>
+
+  <!-- ============ 包車／預約 彈出視窗 ============ -->
+  <div v-if="iform" class="fixed inset-0 z-50 flex items-end" style="background:rgba(45,55,52,.35)" @click.self="iform=null">
+    <div class="w-full bg-[#FCF9F3] rounded-t-[1.75rem] p-5 pb-8 max-h-[90vh] overflow-y-auto sheet-enter">
+      <div class="w-10 h-1 rounded-full bg-ink2/25 mx-auto mb-4"></div>
+      <h3 class="serif text-[20px] mb-4">{{ (iform.isNew ? '新增' : '編輯') + (iform.kind==='car' ? '包車' : '預約') }}</h3>
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="fld">日期</label>
+            <select v-model="iform.date"><option v-for="d in days" :key="d.date" :value="d.date">{{ d.date.slice(5) }}（{{ d.zh }}）</option></select></div>
+          <div><label class="fld">時間（選填）</label><input v-model="iform.time" placeholder="例如 10:30"></div>
+        </div>
+        <template v-if="iform.kind==='car'">
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="fld">出發地</label><input v-model="iform.from" placeholder="新山一機場"></div>
+            <div><label class="fld">目的地</label><input v-model="iform.to" placeholder="Mercure Vung Tau"></div>
+          </div>
+          <div><label class="fld">司機／聯絡電話（選填）</label><input v-model="iform.contact" placeholder="例如 Anh Minh 0901-234-567"></div>
+          <div><label class="fld">備註</label><textarea v-model="iform.note" rows="3" placeholder="車型、價錢、集合地點…"></textarea></div>
+        </template>
+        <template v-else>
+          <div><label class="fld">名稱</label><input v-model="iform.title" placeholder="例如 Pizza 4P's 晚餐"></div>
+          <div><label class="fld">內容</label><textarea v-model="iform.detail" rows="4" placeholder="人數、流程、注意事項…"></textarea></div>
+          <div class="grid grid-cols-3 gap-2">
+            <div><label class="fld">總金額</label><input v-model="iform.total" placeholder="選填"></div>
+            <div><label class="fld">已付</label><input v-model="iform.paid" placeholder="選填"></div>
+            <div><label class="fld">尚需付</label><input v-model="iform.remain" placeholder="選填"></div>
+          </div>
+          <div><label class="fld">Google 地圖連結（選填）</label><input v-model="iform.url" placeholder="https://maps.app.goo.gl/…"></div>
+        </template>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button @click="iform=null" class="flex-1 py-3 rounded-2xl bg-white border border-[rgba(61,74,71,.12)]">取消</button>
+        <button @click="saveInfo()" class="flex-1 py-3 rounded-2xl bg-[#7D9E88] text-white">儲存</button>
+      </div>
+      <button v-if="!iform.isNew" @click="iform.askDel=true" class="w-full mt-3 py-3 rounded-2xl text-[#C0736F] bg-[#F7ECEA]">刪除</button>
+      <div v-if="iform.askDel" class="fixed inset-0 z-[60] flex items-center justify-center p-8" style="background:rgba(45,55,52,.4)">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-xs text-center">
+          <p class="text-[15px] mb-1">刪除這筆{{ iform.kind==='car' ? '包車' : '預約' }}資訊？</p>
+          <p class="text-[13px] text-ink2 mb-4">刪掉之後沒辦法復原。</p>
+          <div class="flex gap-3">
+            <button @click="iform.askDel=false" class="flex-1 py-2.5 rounded-xl bg-[#F3F1EA]">留著</button>
+            <button @click="delInfo()" class="flex-1 py-2.5 rounded-xl bg-[#C0736F] text-white">刪除</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 移除成員確認 ============ -->
+  <div v-if="askDelMember" class="fixed inset-0 z-[70] flex items-center justify-center p-8" style="background:rgba(45,55,52,.4)">
+    <div class="bg-white rounded-2xl p-5 w-full max-w-xs text-center">
+      <p class="text-[15px] mb-1">移除「{{ askDelMember.name }}」？</p>
+      <p class="text-[13px] text-ink2 mb-4 leading-relaxed">對方會被登出，變回只能瀏覽。他發過的便利貼和記帳會保留。</p>
+      <div class="flex gap-3">
+        <button @click="askDelMember=null" class="flex-1 py-2.5 rounded-xl bg-[#F3F1EA]">取消</button>
+        <button @click="removeMember(askDelMember)" class="flex-1 py-2.5 rounded-xl bg-[#C0736F] text-white">移除</button>
+      </div>
     </div>
   </div>
 
@@ -837,6 +959,8 @@ var TRIP_CODE = 'vn-1008-k7q2xw';
 
 /* 成員密碼（四位數） */
 var MEMBER_PIN = '0125';
+/* 管理密碼：萬一主要編輯者不是對的人，輸入這組可以取得主要編輯者權限（請自行改掉） */
+var ADMIN_PIN = '7319';
 
 /* 頁首橫幅：依序嘗試這些檔名，上傳其中一個即可 */
 var BANNER_FILES = ['banner.jpg', 'banner.png', 'banner.jpeg', 'banner.webp'];
@@ -909,6 +1033,18 @@ var SEED = {
   ]
 };
 
+/* 資訊頁：包車與預約（可在 App 裡編輯） */
+var SEED_CARS = [
+  { id: 'car1', date: '2026-10-08', time: '', from: '新山一機場', to: 'Mercure Vung Tau', contact: '', note: '機場接機，單程前往頭頓飯店' },
+  { id: 'car2', date: '2026-10-09', time: '', from: 'Mercure Vung Tau', to: 'KOVA Hotel', contact: '', note: '頭頓飯店單程前往胡志明市飯店' }
+];
+var SEED_BOOKS = [
+  { id: 'bk1', date: '2026-10-11', time: '08:00', title: '奧黛租借＋妝髮＋外拍', url: URL_AODAI,
+    detail: '08:00–10:00 選奧黛、妝髮\n10:00 外出拍照（約 1.5 小時）\n衣服當天下午 5 點前或隔天歸還',
+    total: '7,300,000₫', paid: '4,900,000₫（NT$6,203）', remain: '2,900,000₫ 付現' },
+  { id: 'bk2', date: '2026-10-11', time: '18:30', title: "Pizza 4P's 晚餐", url: URL_PIZZA, detail: '4 位', total: '', paid: '', remain: '' }
+];
+
 var DOW = [['Sun', '日'], ['Mon', '一'], ['Tue', '二'], ['Wed', '三'], ['Thu', '四'], ['Fri', '五'], ['Sat', '六']];
 
 /* 每天晚上住哪裡：[名稱, 備註, Google 地圖連結] */
@@ -969,11 +1105,15 @@ Vue.createApp({
       members: store.get('members', []),
       meId: store.get('me', ''),
       mform: null, draft: {}, tip: '',
-      askDelShop: null, askDelCost: false,
+      askDelShop: null, askDelCost: false, askDelMember: null,
+      cars: store.get('cars', SEED_CARS),
+      books: store.get('books', SEED_BOOKS),
+      iform: null,
       bannerI: 0,
       icons: {
         userPlus: svg('<circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5M19 8v6M16 11h6"/>', 17),
         send: svg('<path d="M4 12l16-8-6 16-2.5-6.5z"/>', 18),
+        pen: svg('<path d="M4 20h4L20 8l-4-4L4 16v4z"/>', 18),
         camera: svg('<path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.2"/>', 16)
       },
       form: null, cform: null, sform: null, askDel: false,
@@ -997,10 +1137,6 @@ Vue.createApp({
         { name: 'Mercure Vung Tau', nights: '10/8–10/9　1 晚', tel: '', addr: '1 Thùy Vân, Thắng Tam, Vũng Tàu（頭頓後灘）', url: URL_MERCURE, q: 'Mercure Vung Tau' },
         { name: 'KOVA Hotel - Bui Vien Central', nights: '10/9–10/12　3 晚', tel: '', addr: '胡志明市第一郡 Bùi Viện 背包客街一帶', url: URL_KOVA, q: 'KOVA Hotel Bui Vien Central' }
       ],
-      cars: [
-        { date: '10/8', dow: 'Thu', from: '新山一機場', to: 'Mercure Vung Tau', note: '機場接機，單程前往頭頓飯店' },
-        { date: '10/9', dow: 'Fri', from: 'Mercure Vung Tau', to: 'KOVA Hotel', note: '頭頓飯店單程前往胡志明市飯店' }
-      ],
       emerg: [
         { num: '113', label: '報警（公安）' }, { num: '115', label: '救護車' },
         { num: '114', label: '火警' },
@@ -1014,7 +1150,37 @@ Vue.createApp({
     me: function () { var id = this.meId; return this.members.find(function (m) { return m.id === id; }) || null; },
     isEditor: function () { return !!this.me; },
     bannerSrc: function () { return BANNER_FILES[this.bannerI] || ''; },
-    total: function () { return this.costs.reduce(function (s, c) { return s + Number(c.amt || 0); }, 0); }
+    totalTwd: function () { var self = this; return this.costs.reduce(function (s, c) { return s + self.toTwd(c); }, 0); },
+    sortedCars: function () { return this.cars.slice().sort(function (a, b) { return (a.date + a.time) < (b.date + b.time) ? -1 : 1; }); },
+    sortedBooks: function () { return this.books.slice().sort(function (a, b) { return (a.date + a.time) < (b.date + b.time) ? -1 : 1; }); },
+    isAdmin: function () { return !!this.me && this.isAdminId(this.me.id); },
+    /* 分帳：每人付了多少、應分攤多少，再算出最少次數的還款方式（以台幣計） */
+    settle: function () {
+      var self = this, bal = {}, used = false;
+      this.costs.forEach(function (c) {
+        if (!c.payer || !c.for || !c.for.length) { return; }
+        var amt = self.toTwd(c); used = true;
+        bal[c.payer] = bal[c.payer] || { paid: 0, share: 0 };
+        bal[c.payer].paid += amt;
+        c.for.forEach(function (id) {
+          bal[id] = bal[id] || { paid: 0, share: 0 };
+          bal[id].share += amt / c.for.length;
+        });
+      });
+      if (!used) { return { people: [], moves: [] }; }
+      var people = Object.keys(bal).map(function (id) { return { id: id, paid: bal[id].paid, share: bal[id].share, net: bal[id].paid - bal[id].share }; });
+      var cred = people.filter(function (x) { return x.net > 0.5; }).map(function (x) { return { id: x.id, v: x.net }; }).sort(function (a, b) { return b.v - a.v; });
+      var debt = people.filter(function (x) { return x.net < -0.5; }).map(function (x) { return { id: x.id, v: -x.net }; }).sort(function (a, b) { return b.v - a.v; });
+      var moves = [], i = 0, j = 0;
+      while (i < debt.length && j < cred.length) {
+        var m = Math.min(debt[i].v, cred[j].v);
+        if (Math.round(m) > 0) { moves.push({ from: debt[i].id, to: cred[j].id, amt: Math.round(m) }); }
+        debt[i].v -= m; cred[j].v -= m;
+        if (debt[i].v < 0.5) { i++; }
+        if (cred[j].v < 0.5) { j++; }
+      }
+      return { people: people, moves: moves };
+    }
   },
 
   mounted: function () { this.addStayEachDay(); this.moveStayLast(); this.getWeather(); this.getRate(); this.initSync(); },
@@ -1029,6 +1195,8 @@ Vue.createApp({
       store.set('shop', this.shop);
       store.set('costs', this.costs);
       store.set('members', this.members);
+      store.set('cars', this.cars);
+      store.set('books', this.books);
       this.schedulePush();
     },
     cityOf: function (d) { return CITY[d] ? CITY[d][0] : ''; },
@@ -1164,6 +1332,8 @@ Vue.createApp({
             self.shop = d.shop || [];
             self.costs = d.costs || [];
             if (d.members) { self.members = d.members; store.set('members', self.members); }
+            if (d.cars) { self.cars = d.cars; store.set('cars', self.cars); }
+            if (d.books) { self.books = d.books; store.set('books', self.books); }
             store.set('items', self.items);
             store.set('notes', self.notes);
             store.set('shop', self.shop);
@@ -1193,6 +1363,8 @@ Vue.createApp({
         shop: JSON.parse(JSON.stringify(this.shop)),
         costs: JSON.parse(JSON.stringify(this.costs)),
         members: JSON.parse(JSON.stringify(this.members)),
+        cars: JSON.parse(JSON.stringify(this.cars)),
+        books: JSON.parse(JSON.stringify(this.books)),
         at: at, by: DEVICE
       }).then(function () { self.mark('saved'); })
         .catch(function () { self.mark('fail'); });
@@ -1265,7 +1437,7 @@ Vue.createApp({
       this.toast('行程已經回到最初的版本');
     },
     exportBackup: function () {
-      var data = { app: 'vietnam', v: 3, at: new Date().toISOString(), items: this.items, notes: this.notes, shop: this.shop, costs: this.costs, members: this.members };
+      var data = { app: 'vietnam', v: 3, at: new Date().toISOString(), items: this.items, notes: this.notes, shop: this.shop, costs: this.costs, members: this.members, cars: this.cars, books: this.books };
       var d = new Date();
       var name = 'vietnam-' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') + '.json';
       var url = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: 'application/json' }));
@@ -1288,6 +1460,8 @@ Vue.createApp({
           self.shop = d.shop || [];
           self.costs = d.costs || [];
           if (d.members) { self.members = d.members; }
+          if (d.cars) { self.cars = d.cars; }
+          if (d.books) { self.books = d.books; }
           self.saveLocal();
           self.toast('已經從備份還原');
         } catch (err) { self.toast('檔案讀不出來，請確認選的是備份檔'); }
@@ -1406,11 +1580,25 @@ Vue.createApp({
     /* --- 花費 --- */
     addCost: function () {
       var t = new Date(), iso = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
-      this.cform = { isNew: true, id: uid(), cat: '飲食', name: '', date: CITY[iso] ? iso : this.active, amt: '', pay: '現金', note: '', by: this.meId };
+      this.cform = { isNew: true, id: uid(), cat: '飲食', name: '', date: CITY[iso] ? iso : this.active, amt: '', cur: 'VND', pay: '現金', note: '', by: this.meId,
+                     payer: this.meId, for: this.members.map(function (m) { return m.id; }) };
     },
-    editCost: function (c) { this.cform = Object.assign({ isNew: false }, c); },
+    editCost: function (c) { this.cform = Object.assign({ isNew: false, cur: 'VND', payer: '', for: [] }, JSON.parse(JSON.stringify(c))); },
+    toggleFor: function (id) {
+      var a = this.cform.for, i = a.indexOf(id);
+      if (i >= 0) { a.splice(i, 1); } else { a.push(id); }
+    },
+    toTwd: function (c) { var v = Number(c.amt || 0); return (c.cur || 'VND') === 'TWD' ? v : v * this.rate; },
+    money: function (v, cur) { v = Number(v || 0); return (cur || 'VND') === 'TWD' ? 'NT$' + v.toLocaleString() : v.toLocaleString() + '₫'; },
+    forText: function (ids) {
+      if (this.members.length > 1 && ids.length === this.members.length) { return '全部 ' + ids.length + ' 人'; }
+      var self = this; return ids.map(function (id) { return self.nameOf(id); }).join('、');
+    },
     saveCost: function () {
       var f = this.cform; if (!f.name) f.name = '未命名';
+      if (!f.amt) { this.say('請輸入金額'); return; }
+      if (f.payer && !f.for.length) { this.say('請選擇幫哪些人付'); return; }
+      if (!f.payer) { f.for = []; }
       var arr = this.costs.slice(), o = Object.assign({}, f); delete o.isNew;
       var i = arr.findIndex(function (x) { return x.id === o.id; });
       if (i < 0) arr.push(o); else arr[i] = o;
@@ -1451,7 +1639,7 @@ Vue.createApp({
     },
     openMember: function () {
       var m = this.me;
-      this.mform = m ? Object.assign({ step: 2, pin: '', err: '' }, m)
+      this.mform = m ? Object.assign({ step: 2, pin: '', err: '', showAdmin: false, adminPin: '' }, m)
                      : { step: 1, pin: '', err: '', id: uid(), name: '', avatar: '' };
     },
     tapPin: function (k) {
@@ -1475,14 +1663,76 @@ Vue.createApp({
         if (f.avatar) { same = Object.assign({}, same, { avatar: f.avatar }); }
         f = { id: same.id, avatar: same.avatar };
       }
-      var o = { id: f.id, name: name, avatar: f.avatar || '' };
-      var arr = this.members.slice(), i = arr.findIndex(function (x) { return x.id === o.id; });
+      var arr = this.members.slice(), i = arr.findIndex(function (x) { return x.id === f.id; });
+      var o = Object.assign({}, i >= 0 ? arr[i] : { admin: !arr.length }, { id: f.id, name: name, avatar: f.avatar || '' });
       if (i < 0) { arr.push(o); } else { arr[i] = o; }
       this.members = arr;
       this.meId = o.id; store.set('me', o.id);
       this.saveLocal(); this.mform = null;
       this.say('歡迎，' + name + '！');
     },
+    /* --- 資訊頁：包車／預約 --- */
+    dayOf: function (date) {
+      var d = this.days.find(function (x) { return x.date === date; });
+      return d ? { md: Number(date.slice(5, 7)) + '/' + d.dd, dow: d.dow, zh: d.zh } : { md: (date || '').slice(5), dow: '', zh: '' };
+    },
+    editInfo: function (kind, x) {
+      var blank = kind === 'car'
+        ? { date: this.active, time: '', from: '', to: '', contact: '', note: '' }
+        : { date: this.active, time: '', title: '', detail: '', total: '', paid: '', remain: '', url: '' };
+      this.iform = Object.assign({ kind: kind, isNew: !x, askDel: false, id: uid() }, blank, x ? JSON.parse(JSON.stringify(x)) : {});
+    },
+    saveInfo: function () {
+      var f = this.iform, key = f.kind === 'car' ? 'cars' : 'books';
+      if (f.kind === 'car' && !f.from && !f.to) { this.say('請填出發地或目的地'); return; }
+      if (f.kind === 'book' && !f.title) { this.say('請填名稱'); return; }
+      var o = Object.assign({}, f); delete o.kind; delete o.isNew; delete o.askDel;
+      var arr = this[key].slice(), i = arr.findIndex(function (x) { return x.id === o.id; });
+      if (i < 0) { arr.push(o); } else { arr[i] = o; }
+      this[key] = arr; this.saveLocal(); this.iform = null;
+    },
+    delInfo: function () {
+      var f = this.iform, key = f.kind === 'car' ? 'cars' : 'books';
+      this[key] = this[key].filter(function (x) { return x.id !== f.id; });
+      this.saveLocal(); this.iform = null;
+    },
+
+    /* --- 主要編輯者：管理成員 --- */
+    isAdminId: function (id) {
+      var flagged = this.members.filter(function (m) { return m.admin; });
+      if (flagged.length) { return flagged.some(function (m) { return m.id === id; }); }
+      return !!this.members.length && this.members[0].id === id;   // 還沒人被設定時，最早加入的人就是主要編輯者
+    },
+    fixAdmins: function () {
+      // 第一次動到權限時，把「最早加入的人」正式標記為主要編輯者
+      var self = this;
+      if (!this.members.some(function (m) { return m.admin; }) && this.members.length) {
+        this.members = this.members.map(function (m, i) { return i === 0 ? Object.assign({}, m, { admin: true }) : m; });
+      }
+      return self.members;
+    },
+    toggleAdmin: function (m) {
+      if (!this.isAdmin) { return; }
+      var on = !this.isAdminId(m.id);
+      this.members = this.fixAdmins().map(function (x) { return x.id === m.id ? Object.assign({}, x, { admin: on }) : x; });
+      this.saveLocal();
+      this.say(on ? m.name + ' 已設為主要編輯者' : '已取消 ' + m.name + ' 的主要編輯者');
+    },
+    removeMember: function (m) {
+      if (!this.isAdmin || m.id === this.meId) { this.askDelMember = null; return; }
+      this.fixAdmins();
+      this.members = this.members.filter(function (x) { return x.id !== m.id; });
+      this.askDelMember = null; this.saveLocal();
+      this.say('已移除 ' + m.name);
+    },
+    claimAdmin: function () {
+      if (this.mform.adminPin !== ADMIN_PIN) { this.say('管理密碼不對'); return; }
+      var id = this.meId;
+      this.members = this.fixAdmins().map(function (x) { return x.id === id ? Object.assign({}, x, { admin: true }) : x; });
+      this.saveLocal(); this.mform.showAdmin = false;
+      this.say('你現在是主要編輯者了');
+    },
+
     loginAs: function (m) {
       this.meId = m.id; store.set('me', m.id);
       this.mform = null;
