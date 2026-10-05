@@ -773,6 +773,20 @@
         </div>
       </template>
 
+      <!-- 輸入密碼後：選自己（重新登入） -->
+      <template v-else-if="!me && mform.step===2">
+        <h3 class="serif text-[20px] mb-1">你是哪一位？</h3>
+        <p class="text-[13px] text-ink2 mb-4">以前加入過的話，點自己的頭像就能登入，不用重新設定。</p>
+        <div class="grid grid-cols-4 gap-3">
+          <button v-for="m in members" :key="m.id" @click="loginAs(m)" class="flex flex-col items-center py-2 rounded-2xl active:bg-white">
+            <img v-if="m.avatar" :src="m.avatar" class="avatar w-14 h-14">
+            <span v-else class="avatar w-14 h-14 serif text-[22px]" :style="{background:colorOf(m.id)}">{{ m.name.slice(0,1) }}</span>
+            <span class="text-[12.5px] mt-1.5 w-full truncate text-center">{{ m.name }}</span>
+          </button>
+        </div>
+        <button @click="mform.step=3" class="w-full mt-5 py-3 rounded-2xl bg-white border border-dashed border-[rgba(61,74,71,.3)] text-[14.5px]">＋ 我是新成員</button>
+      </template>
+
       <template v-else>
         <h3 class="serif text-[20px] mb-4">{{ me ? '我的資料' : '設定暱稱與頭貼' }}</h3>
         <div class="flex justify-center">
@@ -1441,13 +1455,13 @@ Vue.createApp({
                      : { step: 1, pin: '', err: '', id: uid(), name: '', avatar: '' };
     },
     tapPin: function (k) {
-      var f = this.mform; f.err = '';
+      var f = this.mform, self = this; f.err = '';
       if (k === '⌫') { f.pin = f.pin.slice(0, -1); return; }
       if (f.pin.length >= 4) { return; }
       f.pin += k;
       if (f.pin.length === 4) {
         setTimeout(function () {
-          if (f.pin === MEMBER_PIN) { f.step = 2; } else { f.err = '密碼不對，再試一次'; f.pin = ''; }
+          if (f.pin === MEMBER_PIN) { f.step = self.members.length ? 2 : 3; } else { f.err = '密碼不對，再試一次'; f.pin = ''; }
         }, 180);
       }
     },
@@ -1455,6 +1469,12 @@ Vue.createApp({
     saveMember: function () {
       var f = this.mform, name = (f.name || '').trim();
       if (!name) { this.say('請輸入暱稱'); return; }
+      var same = this.members.find(function (x) { return x.name.trim().toLowerCase() === name.toLowerCase() && x.id !== f.id; });
+      if (same && this.me) { this.say('「' + name + '」已經有人用了，換一個暱稱吧'); return; }
+      if (same) {                       // 同名的人＝以前加入過的自己，直接登入
+        if (f.avatar) { same = Object.assign({}, same, { avatar: f.avatar }); }
+        f = { id: same.id, avatar: same.avatar };
+      }
       var o = { id: f.id, name: name, avatar: f.avatar || '' };
       var arr = this.members.slice(), i = arr.findIndex(function (x) { return x.id === o.id; });
       if (i < 0) { arr.push(o); } else { arr[i] = o; }
@@ -1462,6 +1482,11 @@ Vue.createApp({
       this.meId = o.id; store.set('me', o.id);
       this.saveLocal(); this.mform = null;
       this.say('歡迎，' + name + '！');
+    },
+    loginAs: function (m) {
+      this.meId = m.id; store.set('me', m.id);
+      this.mform = null;
+      this.say('歡迎回來，' + m.name + '！');
     },
     logout: function () { this.meId = ''; store.set('me', ''); this.mform = null; this.say('已切換成瀏覽模式'); },
     memberOf: function (id) { return this.members.find(function (m) { return m.id === id; }) || null; },
