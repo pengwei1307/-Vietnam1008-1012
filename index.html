@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#FCF7EF">
+<meta name="theme-color" content="#F8F2EA">
 <title>越南旅行 · 頭頓 胡志明</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
@@ -35,7 +35,7 @@
   :root{
     --paper:#FCF7EF; --paper2:#F3EFE3; --ink:#3D4A47; --ink2:#6E7C77;
     --jade:#8FAE93; --mist:#A8C4CE; --water:#CFE0E4; --lotus:#E3A8B4; --line:rgba(61,74,71,.10);
-    --bgc:#FAF6EE;
+    --bgc:#F8F2EA;
   }
   *{ -webkit-tap-highlight-color:transparent; }
   html,body{ margin:0; padding:0; }
@@ -47,17 +47,20 @@
   }
   .serif{ font-family:"Songti TC","Noto Serif TC","Source Han Serif TC","PMingLiU",serif; }
 
-  /* 水彩背景：上下兩段各自靠邊，照寬度縮放，不裁切 */
-  /* 整頁底色：會自動換成橫幅圖片最下方的顏色 */
+  /* 整頁水彩背景（bg.jpg），固定不動，內容在上面捲動 */
   .bgart{
     position:fixed; inset:0; z-index:0; pointer-events:none;
-    background:var(--bgc);
-    transition:background-color .6s ease;
+    background:var(--bgc) url('bg.jpg') center center / cover no-repeat;
+  }
+  /* 電腦等橫向螢幕：整張圖完整顯示在中間，兩側用紙色補滿 */
+  @media (min-aspect-ratio: 3/4){
+    .bgart{ background-size:auto 100%; }
   }
   .banner{ width:100%; aspect-ratio:1290/830; overflow:hidden; position:relative; }
-  .banner-fade{
-    position:absolute; left:0; right:0; bottom:-1px; height:42%; pointer-events:none;
-    background:linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--bgc) 45%, transparent) 50%, var(--bgc) 100%);
+  /* 橫幅下緣漸漸變透明，直接溶進背景圖 */
+  .banner > img, .banner > .banner-fallback{
+    -webkit-mask-image:linear-gradient(180deg, #000 0%, #000 58%, rgba(0,0,0,.55) 78%, transparent 100%);
+            mask-image:linear-gradient(180deg, #000 0%, #000 58%, rgba(0,0,0,.55) 78%, transparent 100%);
   }
   .avatar{ border-radius:9999px; object-fit:cover; display:inline-flex; align-items:center; justify-content:center; color:#fff; flex:0 0 auto; }
 
@@ -135,13 +138,11 @@
   <!-- ============ 頁首 Banner ============ -->
   <header class="relative">
     <div class="banner">
-      <img v-if="bannerSrc" :src="bannerSrc" alt="越南旅行" class="w-full h-full object-cover" @load="onBanner" @error="bannerI++">
-      <div v-else class="w-full h-full flex flex-col items-center justify-center" style="background:linear-gradient(135deg,#CFE0E4,#F2DEE3 60%,#F3E4D8)">
+      <img v-if="bannerSrc" :src="bannerSrc" alt="越南旅行" class="w-full h-full object-cover" @error="bannerI++">
+      <div v-else class="banner-fallback w-full h-full flex flex-col items-center justify-center" style="background:linear-gradient(135deg,#CFE0E4,#F2DEE3 60%,#F3E4D8)">
         <div class="serif text-[30px] text-white drop-shadow">Vietnam</div>
         <div class="text-white/90 text-[14px] mt-1">10.08 – 10.12</div>
       </div>
-      <!-- 底部淡化，讓圖片溶進頁面底色 -->
-      <div class="banner-fade"></div>
     </div>
 
     <!-- 成員按鈕（左上角） -->
@@ -1642,20 +1643,6 @@ Vue.createApp({
       var id = this.cform.id;
       this.costs = this.costs.filter(function (x) { return x.id !== id; });
       this.saveLocal(); this.askDelCost = false; this.cform = null;
-    },
-
-    /* --- 橫幅：取圖片最下方的顏色當整頁底色 --- */
-    onBanner: function (e) {
-      try {
-        var img = e.target, cv = document.createElement('canvas'), W = 60, H = 40;
-        cv.width = W; cv.height = H;
-        var ctx = cv.getContext('2d'); ctx.drawImage(img, 0, 0, W, H);
-        var px = ctx.getImageData(0, H - 3, W, 3).data, r = 0, g = 0, b = 0, n = 0;
-        for (var i = 0; i < px.length; i += 4) { r += px[i]; g += px[i + 1]; b += px[i + 2]; n++; }
-        var col = 'rgb(' + Math.round(r / n) + ',' + Math.round(g / n) + ',' + Math.round(b / n) + ')';
-        document.documentElement.style.setProperty('--bgc', col);
-        document.querySelector('meta[name=theme-color]').setAttribute('content', col);
-      } catch (err) { /* 直接用電腦開檔案時讀不到像素，沒關係 */ }
     },
 
     /* --- 成員 --- */
