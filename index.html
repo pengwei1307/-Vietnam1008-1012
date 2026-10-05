@@ -64,8 +64,8 @@
   }
   .bgart::after{
     background-position:center bottom;
-    -webkit-mask-image:linear-gradient(0deg, #000 0, #000 74vw, transparent 92vw);
-            mask-image:linear-gradient(0deg, #000 0, #000 74vw, transparent 92vw);
+    -webkit-mask-image:linear-gradient(0deg, #000 0, #000 80vw, transparent 100vw);
+            mask-image:linear-gradient(0deg, #000 0, #000 80vw, transparent 100vw);
   }
   .banner{ width:100%; aspect-ratio:1290/830; overflow:hidden; position:relative; }
   /* 橫幅下緣漸漸變透明，直接溶進背景圖 */
@@ -137,6 +137,23 @@
   label.fld{ font-size:12.5px; color:var(--ink2); margin-bottom:5px; display:block; }
   .drag-handle{ touch-action:none; cursor:grab; }
   [v-cloak]{ display:none; }
+
+  /* 便利貼的文字格式 */
+  .rich{ font-size:14px; line-height:1.75; color:var(--ink2); word-break:break-word; }
+  .rich h2{ font-family:"Songti TC","Noto Serif TC",serif; font-size:21px; line-height:1.35; color:var(--ink); margin:.35em 0 .25em; font-weight:600; }
+  .rich h3{ font-family:"Songti TC","Noto Serif TC",serif; font-size:17px; line-height:1.4; color:var(--ink); margin:.3em 0 .2em; font-weight:600; }
+  .rich p, .rich div{ margin:0; }
+  .rich b, .rich strong{ font-weight:700; color:var(--ink); }
+  .rich i, .rich em{ font-style:italic; }
+  .rich ul{ list-style:disc; padding-left:1.3em; margin:.2em 0; }
+  .rich ol{ list-style:decimal; padding-left:1.4em; margin:.2em 0; }
+  .rich > :first-child{ margin-top:0; }
+  .note-editor{ min-height:260px; background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 12px; outline:none; font-size:15px; }
+  .note-editor:focus{ border-color:var(--jade); box-shadow:0 0 0 3px rgba(143,174,147,.18); }
+  .note-editor:empty:before, .note-editor:not(:focus):has(> p:only-child > br:only-child):before{ content:attr(data-ph); color:#A8B2AE; position:absolute; pointer-events:none; }
+  .note-editor{ position:relative; }
+  .fmt-btn{ min-width:38px; height:36px; padding:0 10px; border-radius:10px; background:#fff; border:1px solid rgba(61,74,71,.12); font-size:14px; color:var(--ink); }
+  .fmt-btn.on{ background:#7D9E88; color:#fff; border-color:transparent; }
 </style>
 </head>
 
@@ -338,9 +355,11 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h4L20 8l-4-4L4 16v4z"/></svg>
           </button>
         </div>
-        <div class="text-[14px] text-ink2 mt-2 whitespace-pre-line leading-[1.75]"
-             :style="openNote[n.id] ? {} : { maxHeight:'8.7em', overflow:'hidden' }">{{ n.body }}</div>
-        <button v-if="n.body && n.body.length > 130" @click="openNote[n.id] = !openNote[n.id]"
+        <div v-if="n.html" class="rich mt-2" v-html="cleanHtml(n.html)"
+             :style="openNote[n.id] || !longNote(n) ? {} : { maxHeight:'11em', overflow:'hidden' }"></div>
+        <div v-else class="text-[14px] text-ink2 mt-2 whitespace-pre-line leading-[1.75]"
+             :style="openNote[n.id] || !longNote(n) ? {} : { maxHeight:'8.7em', overflow:'hidden' }">{{ n.body }}</div>
+        <button v-if="longNote(n)" @click="openNote[n.id] = !openNote[n.id]"
                 class="text-[13px] text-[#7D9E88] mt-2">{{ openNote[n.id] ? '收合' : '展開全部' }}</button>
 
         <!-- 留言 -->
@@ -703,7 +722,18 @@
       <h3 class="serif text-[20px] mb-4">{{ nform.isNew ? '貼一張便利貼' : '編輯便利貼' }}</h3>
       <div class="space-y-3">
         <div><label class="fld">標題</label><input v-model="nform.title" placeholder="例如 明天集合時間"></div>
-        <div><label class="fld">內容</label><textarea v-model="nform.body" rows="14" placeholder="貼上攻略、記下要問的事、抄下地址…"></textarea></div>
+        <div><label class="fld">內容</label>
+          <div class="flex flex-wrap gap-1.5 mb-2">
+            <button type="button" class="fmt-btn" :class="{on: fmt.block==='h2'}" @mousedown.prevent @click="doFmt('h2')">大標題</button>
+            <button type="button" class="fmt-btn" :class="{on: fmt.block==='h3'}" @mousedown.prevent @click="doFmt('h3')">標題</button>
+            <button type="button" class="fmt-btn" :class="{on: fmt.block==='p'}" @mousedown.prevent @click="doFmt('p')">內文</button>
+            <button type="button" class="fmt-btn font-bold" :class="{on: fmt.bold}" @mousedown.prevent @click="doFmt('bold')">B</button>
+            <button type="button" class="fmt-btn italic serif" :class="{on: fmt.italic}" @mousedown.prevent @click="doFmt('italic')">I</button>
+            <button type="button" class="fmt-btn" :class="{on: fmt.list}" @mousedown.prevent @click="doFmt('list')">• 清單</button>
+          </div>
+          <div ref="noteEd" class="note-editor rich" contenteditable="true" data-ph="貼上攻略、記下要問的事、抄下地址…（先選取文字，再按上面的按鈕調整格式）"
+               @keyup="readFmt" @mouseup="readFmt" @touchend="readFmt" @focus="edFocus"></div>
+        </div>
       </div>
       <div class="flex gap-3 mt-6">
         <button @click="nform=null" class="flex-1 py-3 rounded-2xl bg-white border border-[rgba(61,74,71,.12)]">取消</button>
@@ -1139,6 +1169,7 @@ Vue.createApp({
       items: store.get('items', JSON.parse(SEED_RAW)),
       notes: store.get('notes', []),
       openNote: {}, nform: null, askDelNote: false,
+      fmt: { block: 'p', bold: false, italic: false, list: false },
       shop: store.get('shop', []),
       costs: store.get('costs', []),
       weather: {},
@@ -1576,10 +1607,92 @@ Vue.createApp({
     dragEnd: function () { if (this.dragI !== null) { this.dragI = null; this.dragY = 0; this.persist(); } },
 
     /* --- 記事本 --- */
-    addNote: function () { this.nform = { isNew: true, id: uid(), title: '', body: '', by: this.meId, at: Date.now(), comments: [] }; },
-    editNote: function (n) { this.nform = Object.assign({ isNew: false }, n); },
+    addNote: function () { this.nform = { isNew: true, id: uid(), title: '', body: '', html: '', by: this.meId, at: Date.now(), comments: [] }; this.fillEditor(); },
+    editNote: function (n) { this.nform = Object.assign({ isNew: false }, n); this.fillEditor(); },
+    fillEditor: function () {
+      var self = this;
+      this.$nextTick(function () {
+        var ed = self.$refs.noteEd; if (!ed) { return; }
+        var f = self.nform;
+        ed.innerHTML = f.html ? self.cleanHtml(f.html) : self.textToHtml(f.body || '');
+        // 開頭沒有段落標籤的文字，包進 <p>，格式按鈕才作用得到
+        var loose = Array.prototype.filter.call(ed.childNodes, function (c) { return c.nodeType === 3 || (c.nodeType === 1 && /^(B|STRONG|I|EM|BR)$/.test(c.tagName)); });
+        if (loose.length) {
+          var para = document.createElement('p'); ed.insertBefore(para, loose[0]);
+          loose.forEach(function (c) { para.appendChild(c); });
+        }
+        try { document.execCommand('defaultParagraphSeparator', false, 'p'); } catch (e) {}
+      });
+    },
+    textToHtml: function (t) {
+      if (!t) { return ''; }
+      var esc = function (x) { return x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+      return t.split('\n').map(function (line) { return '<p>' + (line ? esc(line) : '<br>') + '</p>'; }).join('');
+    },
+    /* 只留下安全的格式標籤，其他一律拿掉（避免有人塞進奇怪的程式碼） */
+    cleanHtml: function (html) {
+      var ok = { H2: 1, H3: 1, P: 1, DIV: 1, BR: 1, B: 1, STRONG: 1, I: 1, EM: 1, UL: 1, OL: 1, LI: 1 };
+      // 用 DOMParser 解析：解析過程中不會載入圖片或執行任何程式
+      var doc = new DOMParser().parseFromString('<div>' + String(html || '') + '</div>', 'text/html');
+      var box = doc.body.firstChild || doc.createElement('div');
+      (function walk(node) {
+        Array.prototype.slice.call(node.childNodes).forEach(function (ch) {
+          if (ch.nodeType === 3) { return; }
+          if (ch.nodeType !== 1) { node.removeChild(ch); return; }
+          walk(ch);
+          if (!ok[ch.tagName]) {
+            if (/^(SCRIPT|STYLE|IFRAME|OBJECT|EMBED|IMG|SVG|LINK|META)$/.test(ch.tagName)) { node.removeChild(ch); return; }
+            while (ch.firstChild) { node.insertBefore(ch.firstChild, ch); }
+            node.removeChild(ch); return;
+          }
+          while (ch.attributes.length) { ch.removeAttribute(ch.attributes[0].name); }
+        });
+      })(box);
+      // 拿掉結尾多餘的空白段落
+      while (box.lastChild && box.lastChild.nodeType === 1 && /^(P|DIV)$/.test(box.lastChild.tagName) && !box.lastChild.textContent.trim()) { box.removeChild(box.lastChild); }
+      return box.innerHTML;
+    },
+    doFmt: function (k) {
+      var ed = this.$refs.noteEd; if (!ed) { return; }
+      if (document.activeElement !== ed) { ed.focus(); }
+      if (k === 'bold' || k === 'italic') { document.execCommand(k, false, null); }
+      else if (k === 'list') { document.execCommand('insertUnorderedList', false, null); }
+      else { document.execCommand('formatBlock', false, '<' + k + '>'); }
+      this.readFmt();
+    },
+    edFocus: function () {
+      var ed = this.$refs.noteEd;
+      if (ed && !ed.textContent.trim() && !ed.querySelector('li')) {   // 空白時先放一個段落，第一行也能套格式
+        ed.innerHTML = '<p><br></p>';
+        var r = document.createRange(); r.setStart(ed.firstChild, 0); r.collapse(true);
+        var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      }
+      this.readFmt();
+    },
+    readFmt: function () {
+      var f = this.fmt, sel = window.getSelection(), ed = this.$refs.noteEd;
+      try { f.bold = document.queryCommandState('bold'); f.italic = document.queryCommandState('italic'); } catch (e) {}
+      var n = sel && sel.anchorNode, block = 'p', list = false;
+      while (n && n !== ed) {
+        if (n.nodeType === 1) {
+          if (/^H2$|^H3$/.test(n.tagName) && block === 'p') { block = n.tagName.toLowerCase(); }
+          if (n.tagName === 'UL' || n.tagName === 'OL') { list = true; }
+        }
+        n = n.parentNode;
+      }
+      f.block = block; f.list = list;
+    },
+    longNote: function (n) {
+      var t = n.body || '';
+      return t.length > 130 || t.split('\n').length > 6;
+    },
     saveNote: function () {
-      var f = this.nform;
+      var f = this.nform, ed = this.$refs.noteEd;
+      if (ed) {
+        f.html = this.cleanHtml(ed.innerHTML);
+        f.body = (ed.innerText || '').replace(/\n{3,}/g, '\n\n').trim();   // 純文字版本，給舊版和「展開全部」判斷用
+        if (!f.body) { f.html = ''; }
+      }
       if (!f.title && !f.body) { this.nform = null; return; }
       var arr = this.notes.slice(), o = Object.assign({}, f); delete o.isNew;
       var i = arr.findIndex(function (x) { return x.id === o.id; });
