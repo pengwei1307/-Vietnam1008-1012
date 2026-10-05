@@ -825,13 +825,15 @@
 
       <!-- 輸入密碼後：選自己（重新登入） -->
       <template v-else-if="!me && mform.step===2">
-        <h3 class="serif text-[20px] mb-1">你是哪一位？</h3>
+        <h3 class="serif text-[20px] mb-1">你是哪一位？<span v-if="mform.asAdmin" class="ml-2 align-middle text-[12px] px-2 py-0.5 rounded-md bg-[#F3E4D8]">主要編輯者登入</span></h3>
         <p class="text-[13px] text-ink2 mb-4">以前加入過的話，點自己的頭像就能登入，不用重新設定。</p>
         <div class="grid grid-cols-4 gap-3">
-          <button v-for="m in members" :key="m.id" @click="loginAs(m)" class="flex flex-col items-center py-2 rounded-2xl active:bg-white">
+          <button v-for="m in members" :key="m.id" @click="loginAs(m)" class="flex flex-col items-center py-2 rounded-2xl active:bg-white"
+                  :class="m.admin && !mform.asAdmin ? 'opacity-40' : ''">
             <img v-if="m.avatar" :src="m.avatar" class="avatar w-14 h-14">
             <span v-else class="avatar w-14 h-14 serif text-[22px]" :style="{background:colorOf(m.id)}">{{ m.name.slice(0,1) }}</span>
             <span class="text-[12.5px] mt-1.5 w-full truncate text-center">{{ m.name }}</span>
+            <span v-if="m.admin" class="text-[10.5px] text-ink2">主要編輯者</span>
           </button>
         </div>
         <button @click="mform.step=3" class="w-full mt-5 py-3 rounded-2xl bg-white border border-dashed border-[rgba(61,74,71,.3)] text-[14.5px]">＋ 我是新成員</button>
@@ -861,20 +863,12 @@
             <img v-if="m.avatar" :src="m.avatar" class="avatar w-9 h-9">
             <span v-else class="avatar w-9 h-9 serif text-[15px]" :style="{background:colorOf(m.id)}">{{ m.name.slice(0,1) }}</span>
             <div class="flex-1 min-w-0 text-[14px] truncate">{{ m.name }}
-              <span v-if="isAdminId(m.id)" class="ml-1 text-[11px] px-1.5 py-0.5 rounded-md bg-[#F3E4D8]">主要編輯者</span>
+              <span v-if="m.admin" class="ml-1 text-[11px] px-1.5 py-0.5 rounded-md bg-[#F3E4D8]">主要編輯者</span>
               <span v-if="m.id===meId" class="ml-1 text-[11px] text-ink2">（你）</span>
             </div>
             <template v-if="isAdmin && m.id!==meId">
-              <button @click="toggleAdmin(m)" class="text-[12px] px-2 py-1 rounded-lg bg-white border border-[rgba(61,74,71,.12)] shrink-0">{{ isAdminId(m.id) ? '取消主編' : '設為主編' }}</button>
               <button @click="askDelMember=m" class="text-[12px] px-2 py-1 rounded-lg bg-[#F7ECEA] text-[#C0736F] shrink-0">移除</button>
             </template>
-          </div>
-          <div v-if="!isAdmin" class="mt-4">
-            <button v-if="!mform.showAdmin" @click="mform.showAdmin=true" class="text-[12.5px] text-ink2 underline">我是主要編輯者（輸入管理密碼）</button>
-            <div v-else class="flex gap-2">
-              <input v-model="mform.adminPin" type="password" inputmode="numeric" maxlength="8" placeholder="管理密碼" class="flex-1">
-              <button @click="claimAdmin()" class="px-4 rounded-xl bg-[#7D9E88] text-white text-[14px] shrink-0">確認</button>
-            </div>
           </div>
         </div>
       </template>
@@ -957,10 +951,47 @@ var FIREBASE = {
 /* 同行的人打開同一個網址就會同步（越南行程用自己的代碼，不會跟上海的資料混在一起） */
 var TRIP_CODE = 'vn-1008-k7q2xw';
 
-/* 成員密碼（四位數） */
-var MEMBER_PIN = '0125';
-/* 管理密碼：萬一主要編輯者不是對的人，輸入這組可以取得主要編輯者權限（請自行改掉） */
-var ADMIN_PIN = '5113';
+/* 密碼（只存「加密後的指紋」，看原始碼也看不出密碼本身）
+   成員密碼：可以新增和修改內容
+   主要編輯者密碼：另外還能管理（移除）成員
+   想換密碼：跟 Claude 說要換成什麼，它會幫你產生新的指紋 */
+var MEMBER_PIN_HASH = '6967092a11e4c435bdb0053a91e9aeb374c1eaafd6bf0c259756b51ccf918574';
+var ADMIN_PIN_HASH  = 'f94dec57f9a041194ae5a747baa7d664a7553b7a8652077304da79670a51cc76';
+function hashPin(pin) {
+  var text = 'vn-trip:' + pin;
+  if (window.crypto && crypto.subtle) {
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function (buf) {
+      return Array.prototype.map.call(new Uint8Array(buf), function (b) { return ('0' + b.toString(16)).slice(-2); }).join('');
+    });
+  }
+  return Promise.resolve(sha256(text));
+}
+/* 備用：瀏覽器不支援內建加密時用的 SHA-256 */
+function sha256(ascii) {
+  var rr = function (v, n) { return (v >>> n) | (v << (32 - n)); };
+  var K = [], H = [], primes = 0, i, j;
+  for (var c = 2; primes < 64; c++) {
+    var isP = true; for (j = 2; j * j <= c; j++) { if (c % j === 0) { isP = false; break; } }
+    if (isP) { if (primes < 8) { H[primes] = (Math.pow(c, 1 / 2) * 4294967296) | 0; } K[primes++] = (Math.pow(c, 1 / 3) * 4294967296) | 0; }
+  }
+  var bytes = unescape(encodeURIComponent(ascii)), words = [], L = bytes.length * 8;
+  bytes += '\x80'; while (bytes.length % 64 - 56) { bytes += '\x00'; }
+  for (i = 0; i < bytes.length; i++) { words[i >> 2] |= bytes.charCodeAt(i) << ((3 - i) % 4) * 8; }
+  words.push((L / 4294967296) | 0); words.push(L);
+  for (j = 0; j < words.length;) {
+    var w = words.slice(j, j += 16), old = H.slice(0);
+    for (i = 0; i < 64; i++) {
+      var w15 = w[i - 15], w2 = w[i - 2], a = H[0], e = H[4];
+      var t1 = H[7] + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25)) + ((e & H[5]) ^ (~e & H[6])) + K[i] +
+        (w[i] = i < 16 ? w[i] : (w[i - 16] + (rr(w15, 7) ^ rr(w15, 18) ^ (w15 >>> 3)) + w[i - 7] + (rr(w2, 17) ^ rr(w2, 19) ^ (w2 >>> 10))) | 0);
+      var t2 = (rr(a, 2) ^ rr(a, 13) ^ rr(a, 22)) + ((a & H[1]) ^ (a & H[2]) ^ (H[1] & H[2]));
+      H = [(t1 + t2) | 0].concat(H); H[4] = (H[4] + t1) | 0; H.length = 8;
+    }
+    for (i = 0; i < 8; i++) { H[i] = (H[i] + old[i]) | 0; }
+  }
+  var out = ''; for (i = 0; i < 8; i++) { for (j = 3; j + 1; j--) { var b = (H[i] >> (j * 8)) & 255; out += (b < 16 ? '0' : '') + b.toString(16); } }
+  return out;
+}
 
 /* 頁首橫幅：依序嘗試這些檔名，上傳其中一個即可 */
 var BANNER_FILES = ['banner.jpg', 'banner.png', 'banner.jpeg', 'banner.webp'];
@@ -1104,6 +1135,7 @@ Vue.createApp({
       vnd: '', twd: '',
       members: store.get('members', []),
       meId: store.get('me', ''),
+      adminDev: store.get('admin', 0),
       mform: null, draft: {}, tip: '',
       askDelShop: null, askDelCost: false, askDelMember: null,
       cars: store.get('cars', SEED_CARS),
@@ -1153,7 +1185,8 @@ Vue.createApp({
     totalTwd: function () { var self = this; return this.costs.reduce(function (s, c) { return s + self.toTwd(c); }, 0); },
     sortedCars: function () { return this.cars.slice().sort(function (a, b) { return (a.date + a.time) < (b.date + b.time) ? -1 : 1; }); },
     sortedBooks: function () { return this.books.slice().sort(function (a, b) { return (a.date + a.time) < (b.date + b.time) ? -1 : 1; }); },
-    isAdmin: function () { return !!this.me && this.isAdminId(this.me.id); },
+    /* 主要編輯者＝在這支手機用主要編輯者密碼登入的人 */
+    isAdmin: function () { return !!this.me && !!this.adminDev; },
     /* 分帳：每人付了多少、應分攤多少，再算出最少次數的還款方式（以台幣計） */
     settle: function () {
       var self = this, bal = {}, used = false;
@@ -1639,8 +1672,8 @@ Vue.createApp({
     },
     openMember: function () {
       var m = this.me;
-      this.mform = m ? Object.assign({ step: 2, pin: '', err: '', showAdmin: false, adminPin: '' }, m)
-                     : { step: 1, pin: '', err: '', id: uid(), name: '', avatar: '' };
+      this.mform = m ? Object.assign({ step: 2, pin: '', err: '' }, m)
+                     : { step: 1, pin: '', err: '', id: uid(), name: '', avatar: '', asAdmin: false };
     },
     tapPin: function (k) {
       var f = this.mform, self = this; f.err = '';
@@ -1648,9 +1681,14 @@ Vue.createApp({
       if (f.pin.length >= 4) { return; }
       f.pin += k;
       if (f.pin.length === 4) {
-        setTimeout(function () {
-          if (f.pin === MEMBER_PIN) { f.step = self.members.length ? 2 : 3; } else { f.err = '密碼不對，再試一次'; f.pin = ''; }
-        }, 180);
+        hashPin(f.pin).then(function (h) {
+          setTimeout(function () {
+            if (h === ADMIN_PIN_HASH) { f.asAdmin = true; }
+            else if (h === MEMBER_PIN_HASH) { f.asAdmin = false; }
+            else { f.err = '密碼不對，再試一次'; f.pin = ''; return; }
+            f.step = self.members.length ? 2 : 3;
+          }, 150);
+        }).catch(function () { f.err = '這個瀏覽器無法驗證密碼，請用 Safari 或 Chrome 開啟'; f.pin = ''; });
       }
     },
     pickAvatar: function (e) { this.pic(e, this.mform, 240); },
@@ -1659,15 +1697,18 @@ Vue.createApp({
       if (!name) { this.say('請輸入暱稱'); return; }
       var same = this.members.find(function (x) { return x.name.trim().toLowerCase() === name.toLowerCase() && x.id !== f.id; });
       if (same && this.me) { this.say('「' + name + '」已經有人用了，換一個暱稱吧'); return; }
+      if (same && same.admin && !f.asAdmin) { this.say('這個名字是主要編輯者，請用主要編輯者密碼登入'); return; }
       if (same) {                       // 同名的人＝以前加入過的自己，直接登入
         if (f.avatar) { same = Object.assign({}, same, { avatar: f.avatar }); }
-        f = { id: same.id, avatar: same.avatar };
+        f = { id: same.id, avatar: same.avatar, asAdmin: f.asAdmin };
       }
       var arr = this.members.slice(), i = arr.findIndex(function (x) { return x.id === f.id; });
-      var o = Object.assign({}, i >= 0 ? arr[i] : { admin: !arr.length }, { id: f.id, name: name, avatar: f.avatar || '' });
+      var o = Object.assign({}, i >= 0 ? arr[i] : { admin: false }, { id: f.id, name: name, avatar: f.avatar || '' });
       if (i < 0) { arr.push(o); } else { arr[i] = o; }
       this.members = arr;
+      var wasMe = !!this.me;
       this.meId = o.id; store.set('me', o.id);
+      if (!wasMe) { this.setAdmin(o.id, f.asAdmin); }
       this.saveLocal(); this.mform = null;
       this.say('歡迎，' + name + '！');
     },
@@ -1698,47 +1739,27 @@ Vue.createApp({
     },
 
     /* --- 主要編輯者：管理成員 --- */
-    isAdminId: function (id) {
-      var flagged = this.members.filter(function (m) { return m.admin; });
-      if (flagged.length) { return flagged.some(function (m) { return m.id === id; }); }
-      return !!this.members.length && this.members[0].id === id;   // 還沒人被設定時，最早加入的人就是主要編輯者
-    },
-    fixAdmins: function () {
-      // 第一次動到權限時，把「最早加入的人」正式標記為主要編輯者
-      var self = this;
-      if (!this.members.some(function (m) { return m.admin; }) && this.members.length) {
-        this.members = this.members.map(function (m, i) { return i === 0 ? Object.assign({}, m, { admin: true }) : m; });
-      }
-      return self.members;
-    },
-    toggleAdmin: function (m) {
-      if (!this.isAdmin) { return; }
-      var on = !this.isAdminId(m.id);
-      this.members = this.fixAdmins().map(function (x) { return x.id === m.id ? Object.assign({}, x, { admin: on }) : x; });
-      this.saveLocal();
-      this.say(on ? m.name + ' 已設為主要編輯者' : '已取消 ' + m.name + ' 的主要編輯者');
-    },
     removeMember: function (m) {
       if (!this.isAdmin || m.id === this.meId) { this.askDelMember = null; return; }
-      this.fixAdmins();
       this.members = this.members.filter(function (x) { return x.id !== m.id; });
       this.askDelMember = null; this.saveLocal();
       this.say('已移除 ' + m.name);
     },
-    claimAdmin: function () {
-      if (this.mform.adminPin !== ADMIN_PIN) { this.say('管理密碼不對'); return; }
-      var id = this.meId;
-      this.members = this.fixAdmins().map(function (x) { return x.id === id ? Object.assign({}, x, { admin: true }) : x; });
-      this.saveLocal(); this.mform.showAdmin = false;
-      this.say('你現在是主要編輯者了');
-    },
-
     loginAs: function (m) {
+      if (m.admin && !this.mform.asAdmin) { this.say('主要編輯者請用主要編輯者密碼登入'); return; }
+      this.setAdmin(m.id, this.mform.asAdmin);
       this.meId = m.id; store.set('me', m.id);
       this.mform = null;
       this.say('歡迎回來，' + m.name + '！');
     },
-    logout: function () { this.meId = ''; store.set('me', ''); this.mform = null; this.say('已切換成瀏覽模式'); },
+    setAdmin: function (id, on) {
+      this.adminDev = on ? 1 : 0; store.set('admin', this.adminDev);
+      if (on) {   // 讓大家看得到誰是主要編輯者
+        this.members = this.members.map(function (x) { return x.id === id ? Object.assign({}, x, { admin: true }) : x; });
+        this.saveLocal();
+      }
+    },
+    logout: function () { this.meId = ''; store.set('me', ''); this.adminDev = 0; store.set('admin', 0); this.mform = null; this.say('已切換成瀏覽模式'); },
     memberOf: function (id) { return this.members.find(function (m) { return m.id === id; }) || null; },
     nameOf: function (id) { var m = this.memberOf(id); return m ? m.name : '旅伴'; },
     colorOf: function (id) {
