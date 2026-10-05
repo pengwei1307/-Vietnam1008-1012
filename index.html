@@ -1,1225 +1,1496 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>越南旅行 10/8–10/12</title>
-  <meta name="theme-color" content="#fbf3ec" />
-  <!-- 讓 iPhone「加入主畫面」後像 App 一樣全螢幕開啟 -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="越南旅行" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#FCF7EF">
+<title>越南旅行 · 頭頓 胡志明</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
-  <link rel="stylesheet" href="style.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  if (window.tailwind) {
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            paper:  '#FCF7EF',
+            paper2: '#F3EFE3',
+            ink:    '#3D4A47',
+            ink2:   '#6E7C77',
+            jade:   '#8FAE93',
+            mist:   '#A8C4CE',
+            water:  '#CFE0E4',
+            lotus:  '#E3A8B4',
+            clay:   '#C9A98C'
+          }
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  :root{
+    --paper:#FCF7EF; --paper2:#F3EFE3; --ink:#3D4A47; --ink2:#6E7C77;
+    --jade:#8FAE93; --mist:#A8C4CE; --water:#CFE0E4; --lotus:#E3A8B4; --line:rgba(61,74,71,.10);
+    --bgc:#FAF6EE;
+  }
+  *{ -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:"PingFang TC","Heiti TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--bgc);
+    min-height:100vh;
+  }
+  .serif{ font-family:"Songti TC","Noto Serif TC","Source Han Serif TC","PMingLiU",serif; }
+
+  /* 水彩背景：上下兩段各自靠邊，照寬度縮放，不裁切 */
+  /* 整頁底色：會自動換成橫幅圖片最下方的顏色 */
+  .bgart{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:var(--bgc);
+    transition:background-color .6s ease;
+  }
+  .banner{ width:100%; aspect-ratio:1290/830; overflow:hidden; position:relative; }
+  .banner-fade{
+    position:absolute; left:0; right:0; bottom:-1px; height:42%; pointer-events:none;
+    background:linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--bgc) 45%, transparent) 50%, var(--bgc) 100%);
+  }
+  .avatar{ border-radius:9999px; object-fit:cover; display:inline-flex; align-items:center; justify-content:center; color:#fff; flex:0 0 auto; }
+
+  /* 隱藏水平捲軸（日期列） */
+  .no-bar::-webkit-scrollbar{ display:none; }
+  .no-bar{ scrollbar-width:none; -ms-overflow-style:none; }
+
+  /* 宣紙紋理卡片 */
+  .card{
+    background:rgba(255,255,255,.82);
+    backdrop-filter:blur(6px);
+    border:1px solid var(--line);
+    border-radius:20px;
+    box-shadow:0 6px 20px -12px rgba(61,74,71,.35);
+  }
+  .card-drag{
+    box-shadow:0 18px 40px -14px rgba(61,74,71,.45);
+    transform:scale(1.02);
+    opacity:.96;
+  }
+  /* 機票卡：兩側鑿孔 */
+  .ticket{
+    position:relative;
+    background:linear-gradient(135deg,rgba(255,255,255,.88) 0%,rgba(244,248,246,.80) 100%);
+    backdrop-filter:blur(6px);
+    border-radius:20px;
+    box-shadow:0 6px 20px -12px rgba(61,74,71,.35);
+    /* 左右各挖一個真正的洞，背景會透出來 */
+    --notch:12px;
+    -webkit-mask:
+      radial-gradient(circle var(--notch) at 0 50%,transparent 98%,#000 100%),
+      radial-gradient(circle var(--notch) at 100% 50%,transparent 98%,#000 100%);
+    -webkit-mask-composite:source-in;
+    mask:
+      radial-gradient(circle var(--notch) at 0 50%,transparent 98%,#000 100%),
+      radial-gradient(circle var(--notch) at 100% 50%,transparent 98%,#000 100%);
+    mask-composite:intersect;
+  }
+  .dashed{ border-top:1px dashed rgba(61,74,71,.25); }
+
+  /* 交通時間連接線 */
+  .link-line{ width:1px; height:14px; background:linear-gradient(180deg,rgba(61,74,71,.05),rgba(61,74,71,.28)); margin:0 auto; }
+  .link-line.rev{ background:linear-gradient(180deg,rgba(61,74,71,.28),rgba(61,74,71,.05)); }
+  /* 沒填交通時間時的連接線 */
+  .link-plain{ width:1px; height:26px; background:rgba(61,74,71,.18); margin:0 auto; }
+
+  .fab{
+    box-shadow:0 10px 26px -8px rgba(61,74,71,.55);
+    background:linear-gradient(145deg,#9DBBA4,#7D9E88);
+  }
+  .tabbar{ background:rgba(255,255,255,.55); backdrop-filter:blur(10px) saturate(1.2); border:1px solid rgba(255,255,255,.75); }
+  .tab-on{ background:rgba(255,255,255,.95); box-shadow:0 4px 12px -4px rgba(61,74,71,.4); }
+
+  .sheet-enter{ animation:up .28s cubic-bezier(.2,.8,.3,1); }
+  @keyframes up{ from{ transform:translateY(24px); opacity:0 } to{ transform:translateY(0); opacity:1 } }
+  @media (prefers-reduced-motion:reduce){ .sheet-enter{ animation:none } }
+
+  input,select,textarea{
+    background:#FFFFFF; border:1px solid var(--line); border-radius:12px;
+    padding:10px 12px; width:100%; font-size:15px; color:var(--ink); outline:none;
+  }
+  input:focus,select,textarea:focus{ border-color:var(--jade); box-shadow:0 0 0 3px rgba(143,174,147,.18); }
+  label.fld{ font-size:12.5px; color:var(--ink2); margin-bottom:5px; display:block; }
+  .drag-handle{ touch-action:none; cursor:grab; }
+  [v-cloak]{ display:none; }
+</style>
 </head>
+
 <body>
-<div id="app" v-cloak class="max-w-md mx-auto min-h-screen relative pb-28">
+<div id="app" v-cloak>
 
-  <!-- =================== 頁首橫幅 =================== -->
-  <header class="banner" ref="bannerEl">
-    <img v-if="bannerSrc" :src="bannerSrc" alt="banner" @load="onBannerLoad" @error="nextBanner" />
-    <div v-else class="banner-fallback flex flex-col items-center justify-center">
-      <div class="text-3xl font-bold tracking-wide text-white drop-shadow">Vietnam Trip</div>
-      <div class="text-white/90 mt-1 font-semibold">10.08 – 10.12</div>
+  <div class="bgart"></div>
+
+
+  <!-- ============ 頁首 Banner ============ -->
+  <header class="relative">
+    <div class="banner">
+      <img v-if="bannerSrc" :src="bannerSrc" alt="越南旅行" class="w-full h-full object-cover" @load="onBanner" @error="bannerI++">
+      <div v-else class="w-full h-full flex flex-col items-center justify-center" style="background:linear-gradient(135deg,#CFE0E4,#F2DEE3 60%,#F3E4D8)">
+        <div class="serif text-[30px] text-white drop-shadow">Vietnam</div>
+        <div class="text-white/90 text-[14px] mt-1">10.08 – 10.12</div>
+      </div>
+      <!-- 底部淡化，讓圖片溶進頁面底色 -->
+      <div class="banner-fade"></div>
     </div>
-    <div class="banner-fade-top"></div>
-    <div class="banner-fade"></div>
 
-    <!-- 成員按鈕（左上） -->
-    <button class="absolute top-3 left-3 glass rounded-full pl-1 pr-3 py-1 flex items-center gap-2 text-sm"
-            style="top: max(12px, env(safe-area-inset-top));" @click="openMember">
+    <!-- 成員按鈕（左上角） -->
+    <button @click="openMember()" class="absolute left-3 top-3 z-20 flex items-center gap-2 pl-1 pr-3 py-1 rounded-full tabbar text-[13.5px]"
+            style="top:max(12px, env(safe-area-inset-top))">
       <template v-if="me">
-        <img v-if="me.avatar" :src="me.avatar" class="avatar w-8 h-8" />
-        <span v-else class="avatar w-8 h-8 text-sm" :style="{background: colorOf(me.id)}">{{ me.name.slice(0,1) }}</span>
-        <span class="font-semibold max-w-[7rem] truncate">{{ me.name }}</span>
+        <img v-if="me.avatar" :src="me.avatar" class="avatar w-8 h-8">
+        <span v-else class="avatar w-8 h-8 text-[14px]" :style="{background:colorOf(me.id)}">{{ me.name.slice(0,1) }}</span>
+        <span class="max-w-[7rem] truncate">{{ me.name }}</span>
       </template>
       <template v-else>
-        <span class="avatar w-8 h-8 bg-white/80 !text-[color:var(--ink-soft)]"><i class="fa-solid fa-user-plus text-xs"></i></span>
-        <span class="font-semibold">加入成員</span>
+        <span class="avatar w-8 h-8" style="background:rgba(255,255,255,.9);color:#7D9E88" v-html="icons.userPlus"></span>
+        <span>加入成員</span>
       </template>
     </button>
 
-    <!-- 分頁按鈕（右下，浮在圖片上） -->
-    <nav class="absolute right-3 bottom-3 glass rounded-full p-1 flex gap-1 z-10">
-      <button v-for="t in TABS" :key="t.key" class="tab-btn" :class="{active: tab===t.key}" @click="goTab(t.key)" :aria-label="t.label">
-        <i :class="t.icon"></i>
-      </button>
-    </nav>
   </header>
 
-  <!-- 往下捲動後，分頁按鈕固定在右上角 -->
-  <transition name="fade">
-    <nav v-if="tabsStuck" class="fixed z-30 glass rounded-full p-1 flex gap-1 shadow-lg"
-         style="top: max(10px, env(safe-area-inset-top)); right: max(12px, calc(50% - 224px + 12px));">
-      <button v-for="t in TABS" :key="t.key" class="tab-btn !w-9 !h-9 !text-[15px]" :class="{active: tab===t.key}" @click="goTab(t.key)" :aria-label="t.label">
-        <i :class="t.icon"></i>
-      </button>
-    </nav>
-  </transition>
+  <!-- ============ 主內容（負邊距上拉，與圓弧銜接） ============ -->
+  <main class="relative z-10 min-h-[70vh] pb-32"
+        style="background:transparent">
 
-  <main class="-mt-2 relative">
-    <div class="px-5 flex items-end justify-between mb-3">
-      <div>
-        <div class="text-xs tracking-[.2em] uppercase text-[color:var(--ink-soft)]">{{ currentTab.en }}</div>
-        <h1 class="text-2xl font-bold">{{ currentTab.label }}</h1>
+    <!-- 分頁按鈕：貼在內容區頂端，捲動時跟著走，不蓋到 banner -->
+    <div class="sticky top-2 z-40 flex justify-between items-start px-4 pt-3 pb-1 pointer-events-none">
+      <div v-if="sync!=='off' && sync!=='paused'"
+           class="flex items-center gap-1.5 h-9 px-2.5 rounded-2xl tabbar pointer-events-auto text-[12.5px]"
+           :style="{ color: badgeOk() ? '#5B7A64' : '#8A948F' }">
+        <span v-html="badgeIcon()"></span><span>{{ badgeText() }}</span>
       </div>
-      <div class="text-xs text-[color:var(--ink-soft)] text-right">
-        <span v-if="countdown">{{ countdown }}</span>
-      </div>
+      <div v-else></div>
+      <nav class="flex gap-1 p-1 rounded-2xl tabbar pointer-events-auto">
+        <button v-for="t in tabs" :key="t.k" @click="tab=t.k"
+                class="w-11 h-11 rounded-xl flex items-center justify-center transition"
+                :class="tab===t.k ? 'tab-on text-[#5B7A64]' : 'text-ink2/70'"
+                :aria-label="t.label">
+          <span v-html="t.icon"></span>
+        </button>
+      </nav>
     </div>
 
-    <!-- =================== 1. 每日行程 =================== -->
-    <section v-if="tab==='plan'" key="plan" class="page-in">
-      <!-- 日期選單（橫向滑動） -->
-      <div class="flex gap-2 overflow-x-auto no-scrollbar snap-x px-5 pb-2" ref="dayBar">
-        <button v-for="(d, i) in DAYS" :key="d.date" class="day-pill" :class="{active: day===d.date}" @click="day=d.date">
-          <div class="wk">{{ d.wk }}</div>
-          <div class="dn">{{ d.m }}/{{ d.d }}</div>
-        </button>
-      </div>
 
-      <div class="px-5 mt-2 mb-3 flex items-center gap-2 text-sm text-[color:var(--ink-soft)]">
-        <span class="font-bold text-[color:var(--ink)]">Day {{ dayIndex + 1 }}</span>
-        <span>·</span><span>{{ cityOf(day).name }}</span>
-      </div>
-
-      <!-- 天氣 -->
-      <div class="px-5 mb-3">
-        <div class="card px-4 py-3 flex items-center gap-4">
-          <div class="w-14 h-14 rounded-2xl grid place-items-center text-2xl" :style="{background: weatherView.bg}">
-            <i :class="weatherView.icon" :style="{color: weatherView.color}"></i>
-          </div>
-          <div class="flex-1 min-w-0" v-if="weatherView.ok">
-            <div class="flex items-baseline gap-2">
-              <span class="text-3xl font-bold">{{ weatherView.temp }}</span>
-              <span class="text-sm text-[color:var(--ink-soft)]">{{ weatherView.desc }}</span>
-            </div>
-            <div class="text-xs text-[color:var(--ink-soft)] mt-0.5">體感 {{ weatherView.feel }} · {{ weatherView.note }}</div>
-          </div>
-          <div class="flex-1 text-sm text-[color:var(--ink-soft)]" v-else>{{ weatherView.msg }}</div>
+    <!-- ---------- 1. 每日行程 ---------- -->
+    <section v-if="tab==='plan'">
+      <!-- 日期橫向捲軸 -->
+      <div class="pt-1 pb-3 overflow-x-auto no-bar">
+        <div class="flex gap-2.5 px-4">
+          <button v-for="d in days" :key="d.date" @click="pick(d.date)"
+                  class="shrink-0 w-[62px] py-2.5 rounded-2xl transition border"
+                  :class="active===d.date
+                    ? 'bg-[#7D9E88] text-white border-transparent shadow-md'
+                    : 'bg-white/70 border-[rgba(61,74,71,.10)] text-ink'">
+            <div class="serif text-[19px] leading-tight">{{ d.dow }}</div>
+            <div class="text-[13px] opacity-80 mt-0.5">{{ d.dd }}</div>
+          </button>
         </div>
       </div>
 
-      <!-- 行程清單 -->
-      <div v-if="!dayItems.length" class="px-5">
-        <div class="card p-8 text-center text-[color:var(--ink-soft)]">
-          <i class="fa-regular fa-map text-3xl mb-2"></i>
-          <div>這天還沒有行程</div>
-          <div class="text-xs mt-1">點右下角 <b>+</b> 新增想去的地方</div>
+      <div class="px-4">
+        <!-- 天氣 -->
+        <div class="card px-4 py-3 flex items-center gap-3 mb-4">
+          <div class="w-11 h-11 shrink-0" v-html="wxIcon(weather[active] && weather[active].code)"></div>
+          <div class="flex-1">
+            <div class="serif text-[17px]">{{ cityOf(active) }}　{{ weather[active] ? weather[active].text : '取得天氣中…' }}</div>
+            <div class="text-[13px] text-ink2 mt-0.5" v-if="weather[active]">
+              {{ weather[active].min }}° ~ {{ weather[active].max }}°　體感 {{ weather[active].feels }}°
+            </div>
+            <div class="text-[13px] text-ink2 mt-0.5" v-else>連上網路後會自動更新</div>
+          </div>
+        </div>
+
+        <!-- 行程列表 -->
+        <div ref="list">
+          <div v-for="(it,i) in list" :key="it.id">
+
+            <!-- 時間線：有填交通就顯示膠囊，沒填就只留一條線 -->
+            <div class="flex flex-col items-center py-0.5" v-if="i>0">
+              <template v-if="leg(i)">
+                <div class="link-line"></div>
+                <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 border border-[rgba(61,74,71,.10)] text-[12.5px] text-ink2">
+                  <span class="w-4 h-4 inline-block" v-html="moveIcon(leg(i).mode)"></span>
+                  <span>{{ leg(i).text }}</span>
+                </div>
+                <div class="link-line rev"></div>
+              </template>
+              <div v-else class="link-plain"></div>
+            </div>
+
+            <!-- 機票卡 -->
+            <div v-if="it.cat==='航班'" class="ticket p-3.5 mt-2 mb-4 flex gap-3 trip-card"
+                 :class="dragI===i ? 'card-drag' : ''"
+                 :style="dragI===i ? {transform:'translateY('+dragY+'px) scale(1.02)', zIndex:50, position:'relative'} : {}">
+
+              <div class="flex-1 min-w-0" @click="openMap(it)">
+                <div class="flex items-center justify-between">
+                  <div class="text-center">
+                    <div class="serif text-[26px] leading-none">{{ it.from }}</div>
+                    <div class="text-[12px] text-ink2 mt-1">{{ it.dep }}</div>
+                  </div>
+                  <div class="flex-1 px-3">
+                    <div class="text-[11.5px] text-ink2 text-center mb-1">{{ it.name }}</div>
+                    <div class="relative h-3">
+                      <div class="absolute inset-x-0 top-1.5 border-t border-dashed border-[rgba(61,74,71,.3)]"></div>
+                      <svg class="absolute left-1/2 -translate-x-1/2 -top-0.5 w-5 h-5 text-[#7D9E88]" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
+                    </div>
+                    <div class="text-[11.5px] text-ink2 text-center mt-1">{{ it.dur }}</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="serif text-[26px] leading-none">{{ it.to }}</div>
+                    <div class="text-[12px] text-ink2 mt-1">{{ it.arr }}</div>
+                  </div>
+                </div>
+                <div class="dashed mt-3 pt-2 text-[12.5px] text-ink2" v-if="it.note">{{ it.note }}</div>
+              </div>
+
+              <div class="flex flex-col items-center gap-2 shrink-0">
+                <button v-if="isEditor" @click.stop="edit(it)" class="text-ink2/60 p-1" aria-label="編輯">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h4L20 8l-4-4L4 16v4z"/></svg>
+                </button>
+                <div v-if="isEditor" class="drag-handle text-ink2/45 p-1"
+                     @pointerdown="dragStart($event,i)" @pointermove="dragMove($event)"
+                     @pointerup="dragEnd" @pointercancel="dragEnd" aria-label="拖曳排序">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h16M4 12h16M4 16h16"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- 一般行程卡 -->
+            <div v-else class="card p-3.5 mb-1 flex gap-3 trip-card"
+                 :class="dragI===i ? 'card-drag' : ''"
+                 :style="dragI===i ? {transform:'translateY('+dragY+'px) scale(1.02)', zIndex:50, position:'relative'} : {}">
+              <div class="w-9 h-9 shrink-0 rounded-xl flex items-center justify-center"
+                   :style="{background:catBg(it.cat)}" v-html="catIcon(it.cat)"></div>
+
+              <div class="flex-1 min-w-0" @click="openMap(it)">
+                <div class="flex items-center gap-2">
+                  <span class="serif text-[17px] truncate">{{ it.name }}</span>
+                  <span class="text-[11px] px-1.5 py-0.5 rounded-md shrink-0"
+                        :style="{background:catBg(it.cat),color:'#4A5C52'}">{{ it.cat }}</span>
+                </div>
+                <div class="text-[13px] text-ink2 mt-1" v-if="it.hours">🕘 {{ it.hours }}</div>
+                <div class="text-[13px] text-ink2" v-if="it.ticket">🎟 {{ it.ticket }}</div>
+                <div class="text-[13px] text-ink2 mt-1 whitespace-pre-line" v-if="it.note">{{ it.note }}</div>
+                <div class="text-[12px] text-[#7D9E88] mt-1.5">點一下開啟 Google 地圖</div>
+              </div>
+
+              <div class="flex flex-col items-center gap-2 shrink-0">
+                <button v-if="isEditor" @click.stop="edit(it)" class="text-ink2/60 p-1" aria-label="編輯">
+                  <svg class="w-4.5 h-4.5" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h4L20 8l-4-4L4 16v4z"/></svg>
+                </button>
+                <div v-if="isEditor" class="drag-handle text-ink2/45 p-1"
+                     @pointerdown="dragStart($event,i)" @pointermove="dragMove($event)"
+                     @pointerup="dragEnd" @pointercancel="dragEnd" aria-label="拖曳排序">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h16M4 12h16M4 16h16"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p v-if="!list.length" class="text-center text-ink2 text-[14px] py-12">
+            這天還沒有安排。按右下角的加號新增想去的地方。
+          </p>
         </div>
       </div>
 
-      <div class="px-5" ref="planList" :key="listKey">
-        <div v-for="(it, i) in dayItems" :key="it.id" class="it-item">
-          <!-- 交通時間 -->
-          <div class="seg" v-if="segments[i]">
-            <div class="text-[11px] text-[color:var(--ink-soft)] mb-1 ml-3" v-if="segments[i].label">{{ segments[i].label }}</div>
-            <div class="flex flex-wrap items-center gap-1.5 ml-3" v-if="segments[i].near">
-              <span class="seg-chip"><i class="fa-solid fa-location-dot"></i>同一地點／就在附近</span>
-            </div>
-            <div class="flex flex-wrap items-center gap-1.5 ml-3" v-else-if="segments[i].est">
-              <a v-for="m in segments[i].modes" :key="m.mode" :href="m.url" target="_blank" class="seg-chip" :class="{best: m.best}">
-                <i :class="m.icon"></i>{{ m.text }}
-              </a>
-              <span class="text-[11px] text-[color:var(--ink-soft)]">約 {{ segments[i].km }} km</span>
-            </div>
-            <div class="flex flex-wrap items-center gap-1.5 ml-3" v-else>
-              <a :href="segments[i].url" target="_blank" class="seg-chip"><i class="fa-solid fa-route"></i>{{ segments[i].msg }}</a>
-            </div>
-          </div>
-
-          <!-- 航班：機票樣式 -->
-          <div v-if="it.cat==='航班'" class="ticket my-1" @click="openPlace(it)">
-            <div class="pl-6 pr-4 pt-3 pb-2 flex items-center justify-between text-xs text-[color:var(--ink-soft)]">
-              <span><i class="fa-solid fa-plane mr-1"></i>{{ it.airline || 'Flight' }}</span>
-              <div class="flex items-center gap-2" @click.stop>
-                <span class="font-bold text-[color:var(--ink)] tracking-wider">{{ it.flightNo }}</span>
-                <button v-if="isEditor" class="drag-handle w-7 h-7 grid place-items-center"><i class="fa-solid fa-grip-vertical"></i></button>
-                <button v-if="isEditor" class="w-7 h-7 grid place-items-center" @click="editItem(it)"><i class="fa-solid fa-pen"></i></button>
-              </div>
-            </div>
-            <div class="pl-6 pr-4 pb-3 flex items-center">
-              <div>
-                <div class="text-3xl font-bold tracking-wide">{{ it.from }}</div>
-                <div class="text-sm font-semibold">{{ it.dep }}</div>
-                <div class="text-[11px] text-[color:var(--ink-soft)]">{{ airportName(it.from) }}</div>
-              </div>
-              <div class="flight-line"><i class="fa-solid fa-plane"></i></div>
-              <div class="text-right">
-                <div class="text-3xl font-bold tracking-wide">{{ it.to }}</div>
-                <div class="text-sm font-semibold">{{ it.arr }}</div>
-                <div class="text-[11px] text-[color:var(--ink-soft)]">{{ airportName(it.to) }}</div>
-              </div>
-            </div>
-            <div class="ticket-cut"></div>
-            <div class="pl-6 pr-4 py-2.5 flex items-center justify-between text-xs text-[color:var(--ink-soft)]">
-              <span><i class="fa-regular fa-clock mr-1"></i>飛行 {{ flightDuration(it) }}</span>
-              <span class="truncate ml-2">{{ it.note || '點擊查看機場位置' }}</span>
-            </div>
-          </div>
-
-          <!-- 一般行程卡片 -->
-          <div v-else class="card p-3.5 my-1 flex gap-3 cursor-pointer active:scale-[.99] transition" @click="openPlace(it)">
-            <div class="w-11 h-11 rounded-2xl grid place-items-center flex-none" :style="{background: CAT[it.cat].color}">
-              <i :class="CAT[it.cat].icon"></i>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 text-xs text-[color:var(--ink-soft)]">
-                <span v-if="it.time" class="font-bold text-[color:var(--accent-deep)]">{{ it.time }}</span>
-                <span class="px-2 py-0.5 rounded-full" :style="{background: CAT[it.cat].color}">{{ it.cat }}</span>
-              </div>
-              <div class="font-bold text-[15px] mt-1 leading-snug">{{ it.name }}</div>
-              <div v-if="it.hours && HAS_HOURS.includes(it.cat)" class="text-xs text-[color:var(--ink-soft)] mt-1"><i class="fa-regular fa-clock mr-1"></i>{{ it.hours }}</div>
-              <div v-if="it.ticket && it.cat==='景點'" class="text-xs text-[color:var(--ink-soft)] mt-0.5"><i class="fa-solid fa-ticket mr-1"></i>{{ it.ticket }}</div>
-              <div v-if="it.note" class="text-xs mt-1.5 whitespace-pre-line leading-relaxed bg-white/50 rounded-xl px-2.5 py-1.5">{{ it.note }}</div>
-            </div>
-            <div class="flex flex-col items-center justify-between text-[color:var(--ink-soft)]" @click.stop>
-              <button v-if="isEditor" class="drag-handle w-8 h-8 grid place-items-center"><i class="fa-solid fa-grip-vertical"></i></button>
-              <button v-if="isEditor" class="w-8 h-8 grid place-items-center" @click="editItem(it)"><i class="fa-solid fa-pen text-sm"></i></button>
-              <a :href="placeUrl(it)" target="_blank" class="w-8 h-8 grid place-items-center text-[color:var(--accent-deep)]"><i class="fa-solid fa-diamond-turn-right"></i></a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <p class="px-5 mt-4 text-[11px] text-[color:var(--ink-soft)] leading-relaxed" v-if="dayItems.length">
-        交通時間為依距離估算，點擊交通方式可開啟 Google 地圖看即時路線。<span v-if="isEditor">按住 <i class="fa-solid fa-grip-vertical"></i> 可拖曳排序。</span>
-      </p>
+      <button class="fab fixed right-5 bottom-6 w-14 h-14 rounded-full text-white text-3xl leading-none z-30" @click="need() && add()">＋</button>
     </section>
 
-    <!-- =================== 2. 資訊 =================== -->
-    <section v-else-if="tab==='info'" key="info" class="page-in px-5 space-y-4">
-      <!-- 匯率換算 -->
+    <!-- ---------- 記事本 ---------- -->
+    <section v-if="tab==='note'" class="px-4 pt-2">
+      <h2 class="serif text-[20px] mb-4">記事本</h2>
+
+      <div v-for="n in notes" :key="n.id" class="card p-4 mb-3">
+        <div class="flex items-center gap-2 mb-2.5" v-if="n.by">
+          <img v-if="memberOf(n.by) && memberOf(n.by).avatar" :src="memberOf(n.by).avatar" class="avatar w-7 h-7">
+          <span v-else class="avatar w-7 h-7 text-[12px]" :style="{background:colorOf(n.by)}">{{ nameOf(n.by).slice(0,1) }}</span>
+          <span class="text-[13px]">{{ nameOf(n.by) }}</span>
+          <span class="text-[11.5px] text-ink2/70">{{ timeText(n.at) }}</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <div class="serif text-[17px] flex-1 min-w-0">{{ n.title || '未命名' }}</div>
+          <button v-if="isEditor" @click="editNote(n)" class="text-ink2/60 p-1 shrink-0" aria-label="編輯">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h4L20 8l-4-4L4 16v4z"/></svg>
+          </button>
+        </div>
+        <div class="text-[14px] text-ink2 mt-2 whitespace-pre-line leading-[1.75]"
+             :style="openNote[n.id] ? {} : { maxHeight:'8.7em', overflow:'hidden' }">{{ n.body }}</div>
+        <button v-if="n.body && n.body.length > 130" @click="openNote[n.id] = !openNote[n.id]"
+                class="text-[13px] text-[#7D9E88] mt-2">{{ openNote[n.id] ? '收合' : '展開全部' }}</button>
+
+        <!-- 留言 -->
+        <div v-if="n.comments && n.comments.length" class="dashed mt-3 pt-3 space-y-2.5">
+          <div v-for="c in n.comments" :key="c.id" class="flex gap-2">
+            <img v-if="memberOf(c.by) && memberOf(c.by).avatar" :src="memberOf(c.by).avatar" class="avatar w-6 h-6 mt-0.5">
+            <span v-else class="avatar w-6 h-6 text-[11px] mt-0.5" :style="{background:colorOf(c.by)}">{{ nameOf(c.by).slice(0,1) }}</span>
+            <div class="flex-1 min-w-0 bg-[#F4F1E8] rounded-2xl rounded-tl-md px-3 py-1.5">
+              <div class="text-[12px]"><span>{{ nameOf(c.by) }}</span><span class="text-ink2/60 ml-1.5">{{ timeText(c.at) }}</span></div>
+              <div class="text-[14px] text-ink whitespace-pre-line">{{ c.text }}</div>
+            </div>
+            <button v-if="isEditor && c.by===meId" @click="delComment(n,c)" class="text-ink2/40 text-[12px] shrink-0 self-start mt-1">刪除</button>
+          </div>
+        </div>
+        <form class="flex gap-2 mt-3" @submit.prevent="addComment(n)">
+          <input v-model="draft[n.id]" @focus="need()" :placeholder="isEditor ? '留言…' : '加入成員後就能留言'" class="!py-2 !rounded-full text-[14px]">
+          <button class="w-10 h-10 shrink-0 rounded-full bg-[#7D9E88] text-white flex items-center justify-center" aria-label="送出" v-html="icons.send"></button>
+        </form>
+      </div>
+
+      <p v-if="!notes.length" class="text-center text-ink2 text-[14px] py-12">
+        還沒有便利貼。按加號寫下第一則。
+      </p>
+      <button class="fab fixed right-5 bottom-6 w-14 h-14 rounded-full text-white text-3xl leading-none z-30" @click="need() && addNote()">＋</button>
+    </section>
+
+    <!-- ---------- 2. 資訊 ---------- -->
+    <section v-if="tab==='info'" class="px-4 pt-2 space-y-5">
+
+      <!-- 匯率 -->
       <div class="card p-4">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="font-bold"><i class="fa-solid fa-right-left mr-2 text-[color:var(--accent-deep)]"></i>匯率換算</h2>
-          <span class="text-[11px] text-[color:var(--ink-soft)]">{{ rateLabel }}</span>
+        <h2 class="serif text-[19px] mb-1">匯率換算</h2>
+        <p class="text-[12.5px] text-ink2 mb-3">
+          10,000 越南盾 ≈ {{ (rate*10000).toFixed(1) }} 台幣<span v-if="rateNote">（{{ rateNote }}）</span>
+        </p>
+        <div class="flex items-end gap-2">
+          <div class="flex-[1.3]">
+            <label class="fld">越南盾 VND</label>
+            <input type="number" inputmode="numeric" v-model="vnd" @input="twd=fx(vnd,rate)">
+          </div>
+          <div class="pb-3 text-ink2">→</div>
+          <div class="flex-1">
+            <label class="fld">台幣 TWD</label>
+            <input type="number" inputmode="decimal" v-model="twd" @input="vnd=Math.round(fx(twd,1/rate))">
+          </div>
         </div>
-        <label class="field-label !mt-0">越南盾 VND</label>
-        <input class="field text-xl font-bold" inputmode="numeric" :value="fmt(vndInput)" @input="vndInput = toNum($event.target.value)" placeholder="輸入越南盾" />
-        <div class="flex gap-1.5 mt-2 flex-wrap">
-          <button v-for="q in [10000, 50000, 100000, 500000, 1000000]" :key="q" class="text-xs px-2.5 py-1.5 rounded-full bg-white/70" @click="vndInput = q">{{ shortVnd(q) }}</button>
+        <div class="flex gap-1.5 mt-2.5 flex-wrap">
+          <button v-for="q in [20000,50000,100000,500000,1000000]" :key="q" @click="vnd=q; twd=fx(q,rate)"
+                  class="px-2.5 py-1 rounded-full bg-white border border-[rgba(61,74,71,.12)] text-[12.5px]">{{ q>=1000000 ? q/1000000+'M' : q/1000+'K' }}</button>
         </div>
-        <div class="mt-3 rounded-2xl p-3 flex items-center justify-between" style="background: var(--mint)">
-          <span class="text-sm">約台幣</span>
-          <span class="text-2xl font-bold">NT$ {{ fmt(Math.round(vndInput * rate)) }}</span>
-        </div>
-        <div class="text-[11px] text-[color:var(--ink-soft)] mt-2">1 TWD ≈ {{ fmt(Math.round(1 / rate)) }} VND · 小技巧：越南盾去掉三個 0 再 ×1.27 ≈ 台幣</div>
+        <p class="text-[12px] text-ink2 mt-2.5">心算小技巧：越南盾去掉三個 0，再乘 1.27 就差不多是台幣。</p>
       </div>
 
       <!-- 航班 -->
       <div class="card p-4">
-        <h2 class="font-bold mb-3"><i class="fa-solid fa-plane-departure mr-2 text-[color:var(--accent-deep)]"></i>航班資訊</h2>
-        <div v-for="f in FLIGHTS" :key="f.flightNo" class="ticket mb-3 last:mb-0">
-          <div class="pl-6 pr-4 pt-3 flex justify-between text-xs text-[color:var(--ink-soft)]">
-            <span class="px-2 py-0.5 rounded-full text-[color:var(--ink)]" :style="{background: f.dir==='去程' ? 'var(--sky)' : 'var(--pink)'}">{{ f.dir }} · {{ f.dateLabel }}</span>
-            <span class="font-bold text-[color:var(--ink)]">{{ f.airline }} {{ f.flightNo }}</span>
+        <h2 class="serif text-[19px] mb-3">航班</h2>
+        <div v-for="f in flights" :key="f.id" class="mb-4 last:mb-0">
+          <div class="text-[12.5px] text-ink2 mb-1.5">{{ f.leg }}　{{ f.date }}　{{ f.name }}</div>
+          <div class="flex items-center justify-between bg-white/70 rounded-2xl px-4 py-3 border border-[rgba(61,74,71,.08)]">
+            <div class="text-center">
+              <div class="serif text-[24px] leading-none">{{ f.from }}</div>
+              <div class="text-[12px] text-ink2 mt-1">{{ f.dep }}</div>
+            </div>
+            <div class="flex-1 px-3 text-center">
+              <div class="border-t border-dashed border-[rgba(61,74,71,.3)] mt-2"></div>
+              <div class="text-[11.5px] text-ink2 mt-1">{{ f.dur }}</div>
+            </div>
+            <div class="text-center">
+              <div class="serif text-[24px] leading-none">{{ f.to }}</div>
+              <div class="text-[12px] text-ink2 mt-1">{{ f.arr }}</div>
+            </div>
           </div>
-          <div class="pl-6 pr-4 py-3 flex items-center">
-            <div><div class="text-3xl font-bold">{{ f.from }}</div><div class="text-sm font-semibold">{{ f.dep }}</div><div class="text-[11px] text-[color:var(--ink-soft)]">{{ airportName(f.from) }}</div></div>
-            <div class="flight-line"><i class="fa-solid fa-plane"></i></div>
-            <div class="text-right"><div class="text-3xl font-bold">{{ f.to }}</div><div class="text-sm font-semibold">{{ f.arr }}</div><div class="text-[11px] text-[color:var(--ink-soft)]">{{ airportName(f.to) }}</div></div>
-          </div>
-          <div class="ticket-cut"></div>
-          <div class="pl-6 pr-4 py-2.5 text-xs text-[color:var(--ink-soft)] flex justify-between">
-            <span><i class="fa-regular fa-clock mr-1"></i>飛行時間 {{ flightDuration(f) }}</span><span>當地時間</span>
-          </div>
+          <div class="text-[12.5px] text-ink2 mt-1.5">{{ f.note }}</div>
         </div>
       </div>
 
       <!-- 住宿 -->
       <div class="card p-4">
-        <h2 class="font-bold mb-3"><i class="fa-solid fa-bed mr-2 text-[color:var(--accent-deep)]"></i>住宿資訊</h2>
-        <div v-for="h in HOTELS" :key="h.name" class="rounded-2xl bg-white/60 p-3 mb-2 last:mb-0">
-          <div class="flex justify-between items-start">
-            <div class="font-bold">{{ h.name }}</div>
-            <span class="text-[11px] px-2 py-0.5 rounded-full flex-none ml-2" style="background: var(--lav)">{{ h.nights }}</span>
+        <h2 class="serif text-[19px] mb-3">住宿</h2>
+        <div v-for="h in hotels" :key="h.name" class="py-3 border-b border-[rgba(61,74,71,.08)] last:border-0 last:pb-0">
+          <div class="flex justify-between items-baseline gap-2">
+            <span class="serif text-[16px]">{{ h.name }}</span>
+            <span class="text-[12px] text-ink2 shrink-0">{{ h.nights }}</span>
           </div>
-          <div class="text-xs text-[color:var(--ink-soft)] mt-1.5 space-y-1">
-            <div><i class="fa-solid fa-location-dot w-4"></i>{{ h.address }}</div>
-            <div><i class="fa-solid fa-phone w-4"></i><a v-if="h.phone" :href="'tel:' + h.phone" class="underline">{{ h.phone }}</a><span v-else>請見訂房確認信（可在程式碼 HOTELS 補上）</span></div>
-          </div>
-          <div class="flex gap-2 mt-2.5">
-            <a :href="h.mapUrl" target="_blank" class="flex-1 text-center text-sm py-2 rounded-full bg-white/80"><i class="fa-solid fa-map-location-dot mr-1"></i>地圖</a>
-            <a :href="navUrl(h.navQuery)" target="_blank" class="flex-1 text-center text-sm py-2 rounded-full text-white" style="background: var(--accent)"><i class="fa-solid fa-diamond-turn-right mr-1"></i>導航</a>
+          <div class="text-[13px] text-ink2 mt-1">{{ h.addr }}</div>
+          <div class="text-[13px] text-ink2" v-if="!h.tel">電話：請看訂房確認信（可在程式碼 hotels 補上）</div>
+          <div class="flex gap-2 mt-2.5 flex-wrap">
+            <a v-if="h.tel" :href="'tel:'+h.tel" class="px-3 py-1.5 rounded-full bg-white border border-[rgba(61,74,71,.12)] text-[13px]">撥電話</a>
+            <a :href="gnav(h.q)" target="_blank" class="px-3 py-1.5 rounded-full bg-[#7D9E88] text-white text-[13px]">Google 導航</a>
+            <a :href="h.url" target="_blank" class="px-3 py-1.5 rounded-full bg-white border border-[rgba(61,74,71,.12)] text-[13px]">Google 地圖</a>
           </div>
         </div>
       </div>
 
       <!-- 包車 -->
       <div class="card p-4">
-        <h2 class="font-bold mb-3"><i class="fa-solid fa-van-shuttle mr-2 text-[color:var(--accent-deep)]"></i>包車資訊</h2>
-        <div v-for="c in CARS" :key="c.date" class="flex gap-3 mb-3 last:mb-0">
-          <div class="w-12 h-12 rounded-2xl grid place-items-center text-center leading-tight flex-none" style="background: var(--butter)">
-            <div><div class="text-[10px]">{{ c.wk }}</div><div class="font-bold text-sm">{{ c.date }}</div></div>
+        <h2 class="serif text-[19px] mb-3">包車</h2>
+        <div v-for="c in cars" :key="c.date" class="flex gap-3 py-2.5 border-b border-[rgba(61,74,71,.08)] last:border-0 last:pb-0">
+          <div class="w-12 shrink-0 text-center rounded-xl bg-[#E2E9EE] py-1.5">
+            <div class="text-[11px] text-ink2">{{ c.dow }}</div><div class="serif text-[15px]">{{ c.date }}</div>
           </div>
-          <div class="text-sm">
-            <div class="font-bold">{{ c.from }} <i class="fa-solid fa-arrow-right text-xs mx-1 text-[color:var(--ink-soft)]"></i> {{ c.to }}</div>
-            <div class="text-xs text-[color:var(--ink-soft)] mt-0.5">{{ c.note }}</div>
+          <div class="min-w-0">
+            <div class="text-[14.5px]">{{ c.from }} → {{ c.to }}</div>
+            <div class="text-[12.5px] text-ink2 mt-0.5">{{ c.note }}</div>
           </div>
         </div>
       </div>
 
       <!-- 預約 -->
       <div class="card p-4">
-        <h2 class="font-bold mb-3"><i class="fa-regular fa-calendar-check mr-2 text-[color:var(--accent-deep)]"></i>預約資訊</h2>
-        <div class="rounded-2xl bg-white/60 p-3 mb-2">
-          <div class="flex justify-between"><div class="font-bold">奧黛租借 + 妝髮 + 外拍</div><span class="text-[11px] px-2 py-0.5 rounded-full" style="background: var(--pink)">10/11 Sun</span></div>
-          <div class="text-xs text-[color:var(--ink-soft)] mt-1.5 leading-relaxed">
-            08:00–10:00 選奧黛／妝髮<br />10:00 外出拍照（約 1.5 小時）<br />衣服當天下午 5 點或隔天歸還
+        <h2 class="serif text-[19px] mb-3">預約</h2>
+        <div class="py-1">
+          <div class="flex justify-between items-baseline gap-2">
+            <span class="serif text-[16px]">奧黛租借＋妝髮＋外拍</span>
+            <span class="text-[12px] text-ink2 shrink-0">10/11（日）</span>
           </div>
-          <div class="grid grid-cols-3 gap-1.5 mt-2 text-center text-[11px]">
-            <div class="rounded-xl bg-white/80 py-1.5"><div class="text-[color:var(--ink-soft)]">總金額</div><div class="font-bold">7,300,000₫</div></div>
-            <div class="rounded-xl bg-white/80 py-1.5"><div class="text-[color:var(--ink-soft)]">已付訂金</div><div class="font-bold">4,900,000₫</div><div class="text-[color:var(--ink-soft)]">NT$6,203</div></div>
-            <div class="rounded-xl py-1.5" style="background: var(--peach)"><div>尾款(現金)</div><div class="font-bold">2,900,000₫</div></div>
+          <div class="text-[13px] text-ink2 mt-1 leading-relaxed">
+            08:00–10:00 選奧黛、妝髮<br>10:00 外出拍照（約 1.5 小時）<br>衣服當天下午 5 點前或隔天歸還
           </div>
-          <a href="https://maps.app.goo.gl/2ZNkfM9EAgavtAdM7" target="_blank" class="block text-center text-sm py-2 mt-2 rounded-full text-white" style="background: var(--accent)"><i class="fa-solid fa-diamond-turn-right mr-1"></i>店家位置</a>
+          <div class="grid grid-cols-3 gap-2 mt-2.5 text-center">
+            <div class="rounded-xl bg-white/80 border border-[rgba(61,74,71,.08)] py-2"><div class="text-[11.5px] text-ink2">總金額</div><div class="text-[13.5px]">7,300,000₫</div></div>
+            <div class="rounded-xl bg-white/80 border border-[rgba(61,74,71,.08)] py-2"><div class="text-[11.5px] text-ink2">已付訂金</div><div class="text-[13.5px]">4,900,000₫</div><div class="text-[11px] text-ink2">NT$6,203</div></div>
+            <div class="rounded-xl bg-[#F2DEE3] py-2"><div class="text-[11.5px] text-ink2">尾款付現</div><div class="text-[13.5px]">2,900,000₫</div></div>
+          </div>
+          <a href="https://maps.app.goo.gl/2ZNkfM9EAgavtAdM7" target="_blank" class="inline-block mt-2.5 px-3 py-1.5 rounded-full bg-[#7D9E88] text-white text-[13px]">店家位置</a>
         </div>
-        <div class="rounded-2xl bg-white/60 p-3">
-          <div class="flex justify-between"><div class="font-bold">Pizza 4P's 晚餐</div><span class="text-[11px] px-2 py-0.5 rounded-full" style="background: var(--pink)">10/11 Sun</span></div>
-          <div class="text-xs text-[color:var(--ink-soft)] mt-1.5">18:30 · 4 位</div>
-          <a href="https://maps.app.goo.gl/9k9K74R5KcHg7Y6E6" target="_blank" class="block text-center text-sm py-2 mt-2 rounded-full text-white" style="background: var(--accent)"><i class="fa-solid fa-diamond-turn-right mr-1"></i>餐廳位置</a>
+        <div class="pt-3 mt-3 border-t border-[rgba(61,74,71,.08)]">
+          <div class="flex justify-between items-baseline gap-2">
+            <span class="serif text-[16px]">Pizza 4P's 晚餐</span>
+            <span class="text-[12px] text-ink2 shrink-0">10/11（日）</span>
+          </div>
+          <div class="text-[13px] text-ink2 mt-1">18:30　4 位</div>
+          <a href="https://maps.app.goo.gl/9k9K74R5KcHg7Y6E6" target="_blank" class="inline-block mt-2.5 px-3 py-1.5 rounded-full bg-[#7D9E88] text-white text-[13px]">餐廳位置</a>
         </div>
+      </div>
+
+      <!-- 交通小提醒 -->
+      <div class="card p-4">
+        <h2 class="serif text-[19px] mb-2">交通小提醒</h2>
+        <ul class="text-[13.5px] text-ink2 space-y-1.5 leading-relaxed">
+          <li>市區移動用 Grab 叫車最方便，車資在 App 裡先看得到，可綁信用卡或付現。</li>
+          <li>Grab 選「GrabCar」是汽車，「GrabBike」是機車。</li>
+          <li>過馬路時速度放慢、保持一致，機車會自己繞開，不要突然停下或往回跑。</li>
+        </ul>
       </div>
 
       <!-- 緊急 -->
       <div class="card p-4">
-        <h2 class="font-bold mb-3"><i class="fa-solid fa-kit-medical mr-2 text-[#d16565]"></i>緊急聯絡</h2>
-        <div class="grid grid-cols-3 gap-2">
-          <a href="tel:113" class="rounded-2xl p-3 text-center" style="background: var(--sky)"><i class="fa-solid fa-shield-halved text-lg"></i><div class="text-xs mt-1">警察</div><div class="font-bold text-lg">113</div></a>
-          <a href="tel:115" class="rounded-2xl p-3 text-center" style="background: var(--pink)"><i class="fa-solid fa-truck-medical text-lg"></i><div class="text-xs mt-1">救護車</div><div class="font-bold text-lg">115</div></a>
-          <a href="tel:114" class="rounded-2xl p-3 text-center" style="background: var(--peach)"><i class="fa-solid fa-fire-extinguisher text-lg"></i><div class="text-xs mt-1">消防</div><div class="font-bold text-lg">114</div></a>
+        <h2 class="serif text-[19px] mb-3">緊急聯絡</h2>
+        <div class="grid grid-cols-2 gap-2.5">
+          <a v-for="e in emerg" :key="e.num" :href="'tel:'+e.num"
+             class="rounded-2xl px-3 py-3 bg-white/80 border border-[rgba(61,74,71,.10)]">
+            <div class="serif text-[20px]">{{ e.show || e.num }}</div>
+            <div class="text-[12.5px] text-ink2 mt-0.5">{{ e.label }}</div>
+          </a>
         </div>
-        <a href="tel:+84903927019" class="mt-2 rounded-2xl bg-white/60 p-3 flex items-center gap-3">
-          <i class="fa-solid fa-phone-volume text-lg text-[color:var(--accent-deep)]"></i>
-          <div class="text-sm"><div class="font-bold">駐胡志明市台北經濟文化辦事處</div><div class="text-xs text-[color:var(--ink-soft)]">急難救助 +84-903-927-019（護照遺失、重大意外）</div></div>
-        </a>
+        <p class="text-[12px] text-ink2 mt-3">出發前請再確認一次駐外單位號碼，號碼可能異動。</p>
       </div>
 
-      <div class="text-center text-[11px] text-[color:var(--ink-soft)] pb-2">
-        <i :class="cloud ? 'fa-solid fa-cloud' : 'fa-solid fa-mobile-screen'"></i>
-        {{ cloud ? '已開啟雲端同步，成員間資料即時共享' : '資料目前只存在這支手機（尚未開啟雲端同步）' }}
+      <!-- 同步 -->
+      <div class="card p-4">
+        <h2 class="serif text-[19px] mb-2">多人同步</h2>
+        <div class="flex items-center gap-2.5 mb-3">
+          <span class="w-2.5 h-2.5 rounded-full shrink-0"
+                :style="{background: sync==='on' ? '#7D9E88' : (sync==='connecting' ? '#D8C08A' : '#C4B7AE')}"></span>
+          <span class="text-[13.5px] text-ink2">{{ syncText() }}</span>
+        </div>
+        <button v-if="sync!=='off'" @click="toggleSync()"
+                class="w-full py-2.5 rounded-2xl bg-white border border-[rgba(61,74,71,.12)] text-[14px]">
+          {{ sync==='paused' ? '恢復同步' : '暫停同步，只用這支手機' }}
+        </button>
+      </div>
+
+      <!-- 資料管理 -->
+      <div class="card p-4">
+        <h2 class="serif text-[19px] mb-2">資料管理</h2>
+        <p class="text-[13px] text-ink2 mb-3.5 leading-relaxed">
+          行程、購物清單和花費都存在這支手機的瀏覽器裡。換手機、清除瀏覽器資料之前，先匯出一份備份。
+        </p>
+        <div class="space-y-2.5">
+          <button @click="exportBackup()" class="w-full py-3 rounded-2xl bg-[#7D9E88] text-white text-[14.5px]">匯出備份檔</button>
+          <label class="block w-full py-3 rounded-2xl bg-white border border-[rgba(61,74,71,.12)] text-center text-[14.5px]">
+            從備份檔還原
+            <input type="file" accept=".json,application/json" class="hidden" @click="need() || $event.preventDefault()" @change="importBackup($event)">
+          </label>
+          <button @click="need() && (confirmReset=true)" class="w-full py-3 rounded-2xl bg-[#F7ECEA] text-[#C0736F] text-[14.5px]">重設行程</button>
+        </div>
+        <p v-if="msg" class="text-[13px] text-[#5B7A64] mt-3.5 text-center leading-relaxed">{{ msg }}</p>
       </div>
     </section>
 
-    <!-- =================== 3. 購物清單 =================== -->
-    <section v-else-if="tab==='shop'" key="shop" class="page-in px-5">
-      <div class="card px-4 py-3 mb-3 flex items-center justify-between" v-if="store.shopping.length">
-        <span class="text-sm">已買 <b>{{ store.shopping.filter(s => s.done).length }}</b> / {{ store.shopping.length }}</span>
-        <div class="flex-1 mx-3 h-2 rounded-full bg-white/80 overflow-hidden"><div class="h-full rounded-full transition-all" style="background: var(--accent)" :style="{width: (store.shopping.filter(s => s.done).length / store.shopping.length * 100) + '%'}"></div></div>
-      </div>
-      <div v-if="!store.shopping.length" class="card p-8 text-center text-[color:var(--ink-soft)]">
-        <i class="fa-solid fa-basket-shopping text-3xl mb-2"></i><div>還沒有想買的東西</div><div class="text-xs mt-1">點右下角 <b>+</b> 新增</div>
-      </div>
+    <!-- ---------- 3. 購物清單 ---------- -->
+    <section v-if="tab==='shop'" class="px-4 pt-2">
+      <h2 class="serif text-[20px] mb-4">購物清單</h2>
       <div class="grid grid-cols-2 gap-3">
-        <div v-for="s in sortedShopping" :key="s.id" class="card overflow-hidden" :class="{'opacity-60': s.done}">
-          <div class="aspect-square relative" @click="editShop(s)" :style="{background: s.img ? '' : 'var(--pink)'}">
-            <img v-if="s.img" :src="s.img" class="w-full h-full object-cover" />
-            <div v-else class="w-full h-full grid place-items-center text-3xl text-white"><i class="fa-solid fa-gift"></i></div>
-            <button class="absolute top-2 right-2 w-8 h-8 rounded-full grid place-items-center glass" @click.stop="toggleShop(s)">
-              <i class="fa-solid fa-check" :class="s.done ? 'text-[color:var(--accent-deep)]' : 'text-gray-300'"></i>
-            </button>
+        <div v-for="s in shop" :key="s.id" class="card overflow-hidden">
+          <div class="aspect-square bg-[#F1EEE4] flex items-center justify-center">
+            <img v-if="s.img" :src="s.img" class="w-full h-full object-cover">
+            <span v-else class="text-ink2/40 text-[13px]">沒有照片</span>
           </div>
-          <div class="p-2.5">
-            <div class="font-bold text-sm leading-snug" :class="{'line-through': s.done}">{{ s.name }}</div>
-            <div class="flex items-center gap-1.5 mt-1 text-[11px] text-[color:var(--ink-soft)]" v-if="memberOf(s.by)">
-              <img v-if="memberOf(s.by).avatar" :src="memberOf(s.by).avatar" class="avatar w-4 h-4" />
-              <span v-else class="avatar w-4 h-4 text-[8px]" :style="{background: colorOf(s.by)}">{{ memberOf(s.by).name.slice(0,1) }}</span>
-              {{ memberOf(s.by).name }}
+          <div class="p-3 flex items-start justify-between gap-2">
+            <div class="min-w-0 flex-1">
+              <div class="text-[14.5px] truncate">{{ s.name }}</div>
+              <div v-if="s.note" class="text-[12.5px] text-ink2 mt-1 whitespace-pre-line leading-snug">{{ s.note }}</div>
+              <button v-if="isEditor" @click="editShop(s)" class="text-[12px] text-[#7D9E88] mt-1.5">編輯</button>
+              <div v-if="s.by" class="text-[11.5px] text-ink2/70 mt-1">{{ nameOf(s.by) }} 想買</div>
             </div>
+            <button v-if="isEditor" @click="askDelShop=s" class="text-ink2/50 text-[12px] shrink-0">刪除</button>
           </div>
         </div>
       </div>
+      <p v-if="!shop.length" class="text-center text-ink2 text-[14px] py-12">還沒有想買的東西。按加號記下第一項。</p>
+      <button class="fab fixed right-5 bottom-6 w-14 h-14 rounded-full text-white text-3xl leading-none z-30" @click="need() && addShop()">＋</button>
     </section>
 
-    <!-- =================== 4. 記事本 =================== -->
-    <section v-else-if="tab==='note'" key="note" class="page-in px-5">
-      <div v-if="!store.notes.length" class="card p-8 text-center text-[color:var(--ink-soft)]">
-        <i class="fa-solid fa-note-sticky text-3xl mb-2"></i><div>還沒有便利貼</div><div class="text-xs mt-1">點右下角 <b>+</b> 貼一張</div>
+    <!-- ---------- 4. 花費 ---------- -->
+    <section v-if="tab==='cost'" class="px-4 pt-2">
+      <div class="card p-5 mb-5 text-center">
+        <div class="text-[13px] text-ink2">總花費</div>
+        <div class="serif text-[34px] mt-1">{{ total.toLocaleString() }} ₫</div>
+        <div class="text-[13px] text-ink2 mt-1">約 NT$ {{ Math.round(total*rate).toLocaleString() }}</div>
       </div>
-      <div class="space-y-5 pt-2">
-        <div v-for="n in sortedNotes" :key="n.id" class="sticky-note relative p-4" :style="{background: n.color}">
-          <div class="pin"></div>
-          <div class="flex items-center gap-2 mb-2">
-            <img v-if="memberOf(n.by)?.avatar" :src="memberOf(n.by).avatar" class="avatar w-8 h-8" />
-            <span v-else class="avatar w-8 h-8 text-sm" :style="{background: colorOf(n.by)}">{{ (memberOf(n.by)?.name || '?').slice(0,1) }}</span>
-            <div class="flex-1 min-w-0">
-              <div class="font-bold text-sm">{{ memberOf(n.by)?.name || '成員' }}</div>
-              <div class="text-[11px] opacity-60">{{ timeLabel(n.at) }}</div>
-            </div>
-            <button v-if="isEditor" class="w-8 h-8 opacity-50" @click="removeNote(n)"><i class="fa-regular fa-trash-can"></i></button>
-          </div>
-          <div class="whitespace-pre-line leading-relaxed text-[15px]">{{ n.text }}</div>
 
-          <div class="mt-3 pt-2 border-t border-black/5 space-y-2" v-if="(n.comments || []).length">
-            <div v-for="c in n.comments" :key="c.id" class="flex gap-2 text-sm">
-              <img v-if="memberOf(c.by)?.avatar" :src="memberOf(c.by).avatar" class="avatar w-6 h-6 mt-0.5" />
-              <span v-else class="avatar w-6 h-6 text-[10px] mt-0.5" :style="{background: colorOf(c.by)}">{{ (memberOf(c.by)?.name || '?').slice(0,1) }}</span>
-              <div class="bg-white/60 rounded-2xl rounded-tl-md px-3 py-1.5 flex-1">
-                <span class="font-bold text-xs mr-1">{{ memberOf(c.by)?.name || '成員' }}</span>
-                <span class="text-[10px] opacity-50">{{ timeLabel(c.at) }}</span>
-                <div class="whitespace-pre-line">{{ c.text }}</div>
-              </div>
-            </div>
-          </div>
-          <form class="mt-3 flex gap-2" @submit.prevent="addComment(n)">
-            <input class="flex-1 rounded-full bg-white/70 px-3 py-2 text-sm outline-none" v-model="commentDraft[n.id]" :placeholder="isEditor ? '留言…' : '加入成員後即可留言'" @focus="requireEditor()" />
-            <button class="w-9 h-9 rounded-full grid place-items-center text-white flex-none" style="background: var(--accent)"><i class="fa-solid fa-paper-plane text-sm"></i></button>
-          </form>
+      <div v-for="c in costs" :key="c.id" class="card p-3.5 mb-2.5 flex items-center gap-3" @click="need() && editCost(c)">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+             :style="{background:catBg(c.cat)}" v-html="catIcon(c.cat)"></div>
+        <div class="flex-1 min-w-0">
+          <div class="text-[15px] truncate">{{ c.name }}</div>
+          <div class="text-[12.5px] text-ink2 mt-0.5">{{ c.date }}　{{ c.cat }}　{{ c.pay }}<span v-if="c.note">　{{ c.note }}</span></div>
+        </div>
+        <div class="text-right shrink-0">
+          <div class="serif text-[17px]">{{ Number(c.amt).toLocaleString() }}₫</div>
+          <div class="text-[11.5px] text-ink2">≈ NT${{ Math.round(c.amt*rate).toLocaleString() }}</div>
         </div>
       </div>
-    </section>
+      <p v-if="!costs.length" class="text-center text-ink2 text-[14px] py-12">還沒有記錄。花錢之後按加號記一筆。</p>
 
-    <!-- =================== 5. 花費 =================== -->
-    <section v-else-if="tab==='cost'" key="cost" class="page-in px-5">
-      <div class="rounded-[26px] p-5 mb-3 text-[color:var(--ink)]" style="background: linear-gradient(135deg, var(--pink), var(--lav));">
-        <div class="text-xs opacity-70">總花費（約台幣）</div>
-        <div class="text-4xl font-bold mt-1">NT$ {{ fmt(Math.round(totalTwd)) }}</div>
-        <div class="text-sm opacity-80 mt-1">≈ {{ fmt(Math.round(totalTwd / rate)) }} ₫ · 共 {{ store.expenses.length }} 筆</div>
-        <div class="flex gap-1.5 mt-3 flex-wrap" v-if="store.expenses.length">
-          <span v-for="c in costByCat" :key="c.cat" class="text-[11px] px-2.5 py-1 rounded-full bg-white/60">
-            <i :class="EXP_CAT[c.cat].icon" class="mr-1"></i>{{ c.cat }} NT${{ fmt(Math.round(c.twd)) }}
-          </span>
-        </div>
-      </div>
-      <div v-if="!store.expenses.length" class="card p-8 text-center text-[color:var(--ink-soft)]">
-        <i class="fa-solid fa-receipt text-3xl mb-2"></i><div>還沒有花費紀錄</div><div class="text-xs mt-1">點右下角 <b>+</b> 記一筆</div>
-      </div>
-      <div v-for="g in costGroups" :key="g.date" class="mb-4">
-        <div class="flex justify-between text-xs text-[color:var(--ink-soft)] px-1 mb-1.5">
-          <span class="font-bold">{{ dateLabel(g.date) }}</span><span>NT$ {{ fmt(Math.round(g.twd)) }}</span>
-        </div>
-        <div class="card divide-y divide-black/5">
-          <div v-for="e in g.items" :key="e.id" class="flex items-center gap-3 p-3" @click="editExpense(e)">
-            <div class="w-10 h-10 rounded-2xl grid place-items-center flex-none" :style="{background: EXP_CAT[e.cat].color}"><i :class="EXP_CAT[e.cat].icon"></i></div>
-            <div class="flex-1 min-w-0">
-              <div class="font-bold text-sm truncate">{{ e.name || e.cat }}</div>
-              <div class="text-[11px] text-[color:var(--ink-soft)] truncate">
-                <i :class="e.pay==='信用卡' ? 'fa-regular fa-credit-card' : 'fa-solid fa-money-bill-wave'"></i> {{ e.pay }}<span v-if="e.note"> · {{ e.note }}</span>
-              </div>
-            </div>
-            <div class="text-right">
-              <div class="font-bold text-sm">{{ e.cur === 'TWD' ? 'NT$' : '' }}{{ fmt(e.amount) }}{{ e.cur === 'VND' ? '₫' : '' }}</div>
-              <div class="text-[11px] text-[color:var(--ink-soft)]" v-if="e.cur==='VND'">≈ NT${{ fmt(Math.round(e.amount * rate)) }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <button class="fab fixed right-5 bottom-6 w-14 h-14 rounded-full text-white text-3xl leading-none z-30" @click="need() && addCost()">＋</button>
     </section>
   </main>
 
-  <!-- 右下角 + 按鈕 -->
-  <button v-if="tab!=='info'" class="fab" @click="addForTab" aria-label="新增"><i class="fa-solid fa-plus"></i></button>
-
-  <!-- =================== 彈出視窗：行程 =================== -->
-  <transition name="fade"><div v-if="sheet" class="sheet-backdrop" @click="sheet=null"></div></transition>
-  <transition name="sheet">
-    <div v-if="sheet==='item'" class="sheet">
-      <div class="sheet-grip"></div>
-      <div class="flex justify-between items-center mb-1">
-        <h3 class="text-lg font-bold">{{ form.id ? '編輯行程' : '新增行程' }}</h3>
-        <button class="w-9 h-9" @click="sheet=null"><i class="fa-solid fa-xmark"></i></button>
+  <!-- ============ 重設確認 ============ -->
+  <div v-if="confirmReset" class="fixed inset-0 z-[60] flex items-center justify-center p-8" style="background:rgba(45,55,52,.4)">
+    <div class="bg-white rounded-2xl p-5 w-full max-w-xs text-center">
+      <p class="text-[15px] mb-1.5">重設行程？</p>
+      <p class="text-[13px] text-ink2 mb-4 leading-relaxed">五天的行程會回到最初的版本，你自己加的地點和調整過的順序都會不見。購物清單和花費會保留。</p>
+      <div class="flex gap-3">
+        <button @click="confirmReset=false" class="flex-1 py-2.5 rounded-xl bg-[#F3F1EA]">取消</button>
+        <button @click="doReset()" class="flex-1 py-2.5 rounded-xl bg-[#C0736F] text-white">重設</button>
       </div>
-      <label class="field-label">分類</label>
-      <select class="field" v-model="form.cat">
-        <option v-for="c in Object.keys(CAT)" :key="c">{{ c }}</option>
-      </select>
-      <label class="field-label">日期</label>
-      <select class="field" v-model="form.date">
-        <option v-for="d in DAYS" :key="d.date" :value="d.date">{{ d.m }}/{{ d.d }} {{ d.wk }}</option>
-      </select>
+    </div>
+  </div>
 
-      <template v-if="form.cat==='航班'">
-        <div class="grid grid-cols-2 gap-x-2">
-          <div><label class="field-label">航班編號</label><input class="field" v-model="form.flightNo" placeholder="JX711" /></div>
-          <div><label class="field-label">航空公司</label><input class="field" v-model="form.airline" placeholder="星宇航空" /></div>
-          <div><label class="field-label">出發機場</label><input class="field uppercase" v-model="form.from" placeholder="TPE" /></div>
-          <div><label class="field-label">抵達機場</label><input class="field uppercase" v-model="form.to" placeholder="SGN" /></div>
-          <div><label class="field-label">起飛時間</label><input class="field" type="time" v-model="form.dep" /></div>
-          <div><label class="field-label">抵達時間</label><input class="field" type="time" v-model="form.arr" /></div>
-        </div>
-      </template>
-      <template v-else>
-        <label class="field-label">名稱</label>
-        <input class="field" v-model="form.name" placeholder="例如：濱城市場 Ben Thanh Market" />
-        <label class="field-label">預計時間（選填）</label>
-        <input class="field" type="time" v-model="form.time" />
-        <template v-if="HAS_HOURS.includes(form.cat)">
-          <label class="field-label">營業時間</label>
-          <input class="field" v-model="form.hours" placeholder="例如：08:00–22:00" />
+  <!-- ============ 行程 彈出視窗 ============ -->
+  <div v-if="form" class="fixed inset-0 z-50 flex items-end" style="background:rgba(45,55,52,.35)" @click.self="form=null">
+    <div class="w-full bg-[#FCF9F3] rounded-t-[1.75rem] p-5 pb-8 max-h-[88vh] overflow-y-auto sheet-enter">
+      <div class="w-10 h-1 rounded-full bg-ink2/25 mx-auto mb-4"></div>
+      <h3 class="serif text-[20px] mb-4">{{ form.isNew ? '新增行程' : '編輯行程' }}</h3>
+
+      <div class="space-y-3">
+        <div><label class="fld">日期</label>
+          <select v-model="form.date">
+            <option v-for="d in days" :key="d.date" :value="d.date">{{ d.date.slice(5) }}（{{ d.zh }}）</option>
+          </select></div>
+        <div><label class="fld">分類</label>
+          <select v-model="form.cat"><option v-for="c in cats" :key="c">{{ c }}</option></select></div>
+        <div><label class="fld">名稱</label><input v-model="form.name" placeholder="例如 濱城市場 Ben Thanh Market"></div>
+
+        <template v-if="form.cat==='航班'">
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="fld">出發機場</label><input v-model="form.from" placeholder="TPE"></div>
+            <div><label class="fld">抵達機場</label><input v-model="form.to" placeholder="SGN"></div>
+            <div><label class="fld">起飛時間</label><input v-model="form.dep" placeholder="07:40"></div>
+            <div><label class="fld">抵達時間</label><input v-model="form.arr" placeholder="10:15"></div>
+          </div>
+          <div><label class="fld">飛行時間</label><input v-model="form.dur" placeholder="3h35m"></div>
         </template>
-        <template v-if="form.cat==='景點'">
-          <label class="field-label">門票</label>
-          <input class="field" v-model="form.ticket" placeholder="例如：40,000₫／人" />
+
+        <template v-else>
+          <div><label class="fld">營業時間</label><input v-model="form.hours" placeholder="08:00–22:00"></div>
+          <div v-if="form.cat==='景點'"><label class="fld">門票</label><input v-model="form.ticket" placeholder="40,000₫"></div>
         </template>
-        <label class="field-label">地址／地圖搜尋關鍵字（選填，預設用名稱）</label>
-        <input class="field" v-model="form.place" placeholder="例如：Ben Thanh Market, District 1" />
-        <label class="field-label">Google 地圖連結（選填）</label>
-        <input class="field" v-model="form.mapUrl" placeholder="https://maps.app.goo.gl/..." />
-        <label class="field-label">座標（選填，讓交通時間更準）</label>
-        <input class="field" v-model="form.coord" placeholder="10.7725, 106.6980" />
-        <div class="text-[11px] text-[color:var(--ink-soft)] mt-1 ml-1">在 Google 地圖上長按地點，最上方那串數字就是座標，複製貼上即可。沒填會自動用名稱搜尋位置。</div>
-      </template>
-      <label class="field-label">特色 & 備註</label>
-      <textarea class="field" v-model="form.note" placeholder="必吃、必買、注意事項…"></textarea>
 
-      <div class="mt-5 space-y-2">
-        <button class="btn-main" @click="saveItem">儲存</button>
-        <button v-if="form.id" class="btn-danger" @click="deleteItem"><i class="fa-regular fa-trash-can mr-1"></i>刪除這個行程</button>
-      </div>
-    </div>
-  </transition>
+        <template v-if="form.cat!=='航班'">
+          <div class="pt-1">
+            <label class="fld">從上一個行程到這裡的交通（選填）</label>
+            <div class="grid grid-cols-2 gap-3">
+              <select v-model="form.mode">
+                <option value="">不指定</option>
+                <option value="walk">走路</option>
+                <option value="taxi">Grab／計程車</option>
+                <option value="car">包車</option>
+                <option value="metro">捷運／公車</option>
+              </select>
+              <input type="number" inputmode="numeric" v-model="form.mins" placeholder="分鐘">
+            </div>
+            <p class="text-[12px] text-ink2 mt-1.5">留空就不顯示這段交通。</p>
+          </div>
+          <div><label class="fld">Google 地圖連結（選填）</label>
+            <input v-model="form.url" placeholder="https://maps.app.goo.gl/…">
+            <p class="text-[12px] text-ink2 mt-1.5">在 Google 地圖按「分享」→「複製連結」貼上；沒填就用名稱搜尋。</p></div>
+        </template>
 
-  <!-- =================== 彈出視窗：購物 =================== -->
-  <transition name="sheet">
-    <div v-if="sheet==='shop'" class="sheet">
-      <div class="sheet-grip"></div>
-      <div class="flex justify-between items-center mb-1">
-        <h3 class="text-lg font-bold">{{ form.id ? '編輯購物項目' : '新增購物項目' }}</h3>
-        <button class="w-9 h-9" @click="sheet=null"><i class="fa-solid fa-xmark"></i></button>
+        <div><label class="fld">特色 & 備註</label><textarea v-model="form.note" rows="3"></textarea></div>
       </div>
-      <label class="field-label">商品名稱</label>
-      <input class="field" v-model="form.name" placeholder="例如：G7 咖啡、腰果、手工皂" />
-      <label class="field-label">圖片</label>
-      <label class="block rounded-2xl overflow-hidden bg-white/70 aspect-[4/3] grid place-items-center cursor-pointer relative">
-        <img v-if="form.img" :src="form.img" class="w-full h-full object-cover absolute inset-0" />
-        <div v-else class="text-center text-[color:var(--ink-soft)]"><i class="fa-solid fa-camera text-2xl"></i><div class="text-xs mt-1">拍照或從相簿選擇</div></div>
-        <input type="file" accept="image/*" class="hidden" @change="pickImage($event, 'img', 900)" />
-      </label>
-      <button v-if="form.img" class="text-xs text-[color:var(--ink-soft)] mt-1 ml-1" @click="form.img=''">移除圖片</button>
-      <div class="mt-5 space-y-2">
-        <button class="btn-main" @click="saveShop">儲存</button>
-        <button v-if="form.id" class="btn-danger" @click="deleteShop"><i class="fa-regular fa-trash-can mr-1"></i>刪除</button>
-      </div>
-    </div>
-  </transition>
 
-  <!-- =================== 彈出視窗：便利貼 =================== -->
-  <transition name="sheet">
-    <div v-if="sheet==='note'" class="sheet">
-      <div class="sheet-grip"></div>
-      <div class="flex justify-between items-center mb-1">
-        <h3 class="text-lg font-bold">貼一張便利貼</h3>
-        <button class="w-9 h-9" @click="sheet=null"><i class="fa-solid fa-xmark"></i></button>
+      <div class="flex gap-3 mt-6">
+        <button @click="form=null" class="flex-1 py-3 rounded-2xl bg-white border border-[rgba(61,74,71,.12)]">取消</button>
+        <button @click="save()" class="flex-1 py-3 rounded-2xl bg-[#7D9E88] text-white">儲存</button>
       </div>
-      <label class="field-label">顏色</label>
-      <div class="flex gap-2">
-        <button v-for="c in NOTE_COLORS" :key="c" class="w-9 h-9 rounded-full border-2" :style="{background: c, borderColor: form.color===c ? 'var(--accent)' : 'transparent'}" @click="form.color=c"></button>
-      </div>
-      <label class="field-label">內容</label>
-      <textarea class="field !min-h-[140px]" :style="{background: form.color}" v-model="form.text" placeholder="想說的話、提醒、集合時間…"></textarea>
-      <div class="mt-5"><button class="btn-main" @click="saveNote">貼上</button></div>
-    </div>
-  </transition>
+      <button v-if="!form.isNew" @click="askDel=true" class="w-full mt-3 py-3 rounded-2xl text-[#C0736F] bg-[#F7ECEA]">刪除這個行程</button>
 
-  <!-- =================== 彈出視窗：花費 =================== -->
-  <transition name="sheet">
-    <div v-if="sheet==='cost'" class="sheet">
-      <div class="sheet-grip"></div>
-      <div class="flex justify-between items-center mb-1">
-        <h3 class="text-lg font-bold">{{ form.id ? '編輯花費' : '記一筆花費' }}</h3>
-        <button class="w-9 h-9" @click="sheet=null"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <label class="field-label">類別</label>
-      <div class="seg-select">
-        <button v-for="c in Object.keys(EXP_CAT)" :key="c" :class="{on: form.cat===c}" @click="form.cat=c"><i :class="EXP_CAT[c].icon" class="mr-1"></i>{{ c }}</button>
-      </div>
-      <label class="field-label">名稱</label>
-      <input class="field" v-model="form.name" placeholder="例如：Grab 到市區" />
-      <label class="field-label">日期</label>
-      <input class="field" type="date" v-model="form.date" />
-      <label class="field-label">金額</label>
-      <div class="flex gap-2">
-        <input class="field flex-1 text-lg font-bold" inputmode="decimal" :value="fmt(form.amount)" @input="form.amount = toNum($event.target.value)" placeholder="0" />
-        <div class="seg-select flex-none !flex-nowrap items-center">
-          <button :class="{on: form.cur==='VND'}" @click="form.cur='VND'">₫ 越南盾</button>
-          <button :class="{on: form.cur==='TWD'}" @click="form.cur='TWD'">NT$</button>
+      <div v-if="askDel" class="fixed inset-0 z-[60] flex items-center justify-center p-8" style="background:rgba(45,55,52,.4)">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-xs text-center">
+          <p class="text-[15px] mb-1">刪除「{{ form.name }}」？</p>
+          <p class="text-[13px] text-ink2 mb-4">刪掉之後沒辦法復原。</p>
+          <div class="flex gap-3">
+            <button @click="askDel=false" class="flex-1 py-2.5 rounded-xl bg-[#F3F1EA]">留著</button>
+            <button @click="del()" class="flex-1 py-2.5 rounded-xl bg-[#C0736F] text-white">刪除</button>
+          </div>
         </div>
       </div>
-      <div class="text-[11px] text-[color:var(--ink-soft)] mt-1 ml-1" v-if="form.cur==='VND' && form.amount">≈ NT$ {{ fmt(Math.round(form.amount * rate)) }}</div>
-      <label class="field-label">付款方式</label>
-      <div class="seg-select">
-        <button :class="{on: form.pay==='現金'}" @click="form.pay='現金'"><i class="fa-solid fa-money-bill-wave mr-1"></i>現金</button>
-        <button :class="{on: form.pay==='信用卡'}" @click="form.pay='信用卡'"><i class="fa-regular fa-credit-card mr-1"></i>信用卡</button>
+    </div>
+  </div>
+
+  <!-- ============ 記事本 彈出視窗 ============ -->
+  <div v-if="nform" class="fixed inset-0 z-50 flex items-end" style="background:rgba(45,55,52,.35)" @click.self="nform=null">
+    <div class="w-full bg-[#FCF9F3] rounded-t-[1.75rem] p-5 pb-8 max-h-[92vh] overflow-y-auto sheet-enter">
+      <div class="w-10 h-1 rounded-full bg-ink2/25 mx-auto mb-4"></div>
+      <h3 class="serif text-[20px] mb-4">{{ nform.isNew ? '貼一張便利貼' : '編輯便利貼' }}</h3>
+      <div class="space-y-3">
+        <div><label class="fld">標題</label><input v-model="nform.title" placeholder="例如 明天集合時間"></div>
+        <div><label class="fld">內容</label><textarea v-model="nform.body" rows="14" placeholder="貼上攻略、記下要問的事、抄下地址…"></textarea></div>
       </div>
-      <label class="field-label">備註</label>
-      <input class="field" v-model="form.note" placeholder="選填" />
-      <div class="mt-5 space-y-2">
-        <button class="btn-main" @click="saveExpense">儲存</button>
-        <button v-if="form.id" class="btn-danger" @click="deleteExpense"><i class="fa-regular fa-trash-can mr-1"></i>刪除</button>
+      <div class="flex gap-3 mt-6">
+        <button @click="nform=null" class="flex-1 py-3 rounded-2xl bg-white border border-[rgba(61,74,71,.12)]">取消</button>
+        <button @click="saveNote()" class="flex-1 py-3 rounded-2xl bg-[#7D9E88] text-white">儲存</button>
+      </div>
+      <button v-if="!nform.isNew" @click="askDelNote=true" class="w-full mt-3 py-3 rounded-2xl text-[#C0736F] bg-[#F7ECEA]">刪除這張便利貼</button>
+
+      <div v-if="askDelNote" class="fixed inset-0 z-[60] flex items-center justify-center p-8" style="background:rgba(45,55,52,.4)">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-xs text-center">
+          <p class="text-[15px] mb-1">刪除「{{ nform.title || '未命名' }}」？</p>
+          <p class="text-[13px] text-ink2 mb-4">刪掉之後沒辦法復原。</p>
+          <div class="flex gap-3">
+            <button @click="askDelNote=false" class="flex-1 py-2.5 rounded-xl bg-[#F3F1EA]">留著</button>
+            <button @click="delNote()" class="flex-1 py-2.5 rounded-xl bg-[#C0736F] text-white">刪除</button>
+          </div>
+        </div>
       </div>
     </div>
-  </transition>
+  </div>
 
-  <!-- =================== 彈出視窗：成員 =================== -->
-  <transition name="sheet">
-    <div v-if="sheet==='member'" class="sheet">
-      <div class="sheet-grip"></div>
-      <div class="flex justify-between items-center mb-1">
-        <h3 class="text-lg font-bold">{{ me ? '我的資料' : (joinStep===1 ? '加入成員' : '設定暱稱與頭貼') }}</h3>
-        <button class="w-9 h-9" @click="sheet=null"><i class="fa-solid fa-xmark"></i></button>
+  <!-- ============ 花費 彈出視窗 ============ -->
+  <div v-if="cform" class="fixed inset-0 z-50 flex items-end" style="background:rgba(45,55,52,.35)" @click.self="cform=null">
+    <div class="w-full bg-[#FCF9F3] rounded-t-[1.75rem] p-5 pb-8 max-h-[88vh] overflow-y-auto sheet-enter">
+      <div class="w-10 h-1 rounded-full bg-ink2/25 mx-auto mb-4"></div>
+      <h3 class="serif text-[20px] mb-4">{{ cform.isNew ? '新增花費' : '編輯花費' }}</h3>
+      <div class="space-y-3">
+        <div><label class="fld">類別</label>
+          <select v-model="cform.cat"><option v-for="c in costCats" :key="c">{{ c }}</option></select></div>
+        <div><label class="fld">名稱</label><input v-model="cform.name" placeholder="例如 河粉 Phở"></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="fld">日期</label>
+            <select v-model="cform.date"><option v-for="d in days" :key="d.date" :value="d.date">{{ d.date.slice(5) }}（{{ d.zh }}）</option></select></div>
+          <div><label class="fld">金額（越南盾）</label><input type="number" inputmode="numeric" v-model="cform.amt" placeholder="0">
+            <div class="text-[12px] text-ink2 mt-1" v-if="cform.amt">≈ NT$ {{ Math.round(cform.amt*rate).toLocaleString() }}</div></div>
+        </div>
+        <div><label class="fld">付款方式</label>
+          <select v-model="cform.pay"><option>現金</option><option>信用卡</option></select></div>
+        <div><label class="fld">備註</label><input v-model="cform.note"></div>
       </div>
+      <div class="flex gap-3 mt-6">
+        <button @click="cform=null" class="flex-1 py-3 rounded-2xl bg-white border border-[rgba(61,74,71,.12)]">取消</button>
+        <button @click="saveCost()" class="flex-1 py-3 rounded-2xl bg-[#7D9E88] text-white">儲存</button>
+      </div>
+      <button v-if="!cform.isNew" @click="askDelCost=true" class="w-full mt-3 py-3 rounded-2xl text-[#C0736F] bg-[#F7ECEA]">刪除這筆</button>
+      <div v-if="askDelCost" class="fixed inset-0 z-[60] flex items-center justify-center p-8" style="background:rgba(45,55,52,.4)">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-xs text-center">
+          <p class="text-[15px] mb-1">刪除「{{ cform.name || '未命名' }}」？</p>
+          <p class="text-[13px] text-ink2 mb-4">刪掉之後沒辦法復原。</p>
+          <div class="flex gap-3">
+            <button @click="askDelCost=false" class="flex-1 py-2.5 rounded-xl bg-[#F3F1EA]">留著</button>
+            <button @click="delCost()" class="flex-1 py-2.5 rounded-xl bg-[#C0736F] text-white">刪除</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      <template v-if="!me && joinStep===1">
-        <p class="text-sm text-[color:var(--ink-soft)] mt-1">輸入四位數密碼，即可成為編輯者，新增與修改行程。</p>
+  <!-- ============ 購物 彈出視窗 ============ -->
+  <div v-if="sform" class="fixed inset-0 z-50 flex items-end" style="background:rgba(45,55,52,.35)" @click.self="sform=null">
+    <div class="w-full bg-[#FCF9F3] rounded-t-[1.75rem] p-5 pb-8 sheet-enter">
+      <div class="w-10 h-1 rounded-full bg-ink2/25 mx-auto mb-4"></div>
+      <h3 class="serif text-[20px] mb-4">{{ sform.isNew ? '想買的東西' : '編輯' }}</h3>
+      <div><label class="fld">商品名稱</label><input v-model="sform.name" placeholder="例如 G7 咖啡、腰果"></div>
+      <div class="mt-3"><label class="fld">記事</label>
+        <textarea v-model="sform.note" rows="4" placeholder="價格、店家、尺寸、幫誰買…"></textarea></div>
+      <div class="mt-3">
+        <label class="fld">照片</label>
+        <label class="block w-full py-3 rounded-2xl bg-white border border-dashed border-[rgba(61,74,71,.25)] text-center text-[14px] text-ink2">
+          {{ sform.img ? '換一張照片' : '從手機選一張照片' }}
+          <input type="file" accept="image/*" class="hidden" @change="pic($event,sform)">
+        </label>
+        <img v-if="sform.img" :src="sform.img" class="mt-3 w-full rounded-2xl">
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button @click="sform=null" class="flex-1 py-3 rounded-2xl bg-white border border-[rgba(61,74,71,.12)]">取消</button>
+        <button @click="saveShop()" class="flex-1 py-3 rounded-2xl bg-[#7D9E88] text-white">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 購物 刪除確認 ============ -->
+  <div v-if="askDelShop" class="fixed inset-0 z-[60] flex items-center justify-center p-8" style="background:rgba(45,55,52,.4)">
+    <div class="bg-white rounded-2xl p-5 w-full max-w-xs text-center">
+      <p class="text-[15px] mb-1">刪除「{{ askDelShop.name }}」？</p>
+      <p class="text-[13px] text-ink2 mb-4">刪掉之後沒辦法復原。</p>
+      <div class="flex gap-3">
+        <button @click="askDelShop=null" class="flex-1 py-2.5 rounded-xl bg-[#F3F1EA]">留著</button>
+        <button @click="delShop(askDelShop); askDelShop=null" class="flex-1 py-2.5 rounded-xl bg-[#C0736F] text-white">刪除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 成員 彈出視窗 ============ -->
+  <div v-if="mform" class="fixed inset-0 z-50 flex items-end" style="background:rgba(45,55,52,.35)" @click.self="mform=null">
+    <div class="w-full bg-[#FCF9F3] rounded-t-[1.75rem] p-5 pb-8 max-h-[90vh] overflow-y-auto sheet-enter">
+      <div class="w-10 h-1 rounded-full bg-ink2/25 mx-auto mb-4"></div>
+
+      <template v-if="!me && mform.step===1">
+        <h3 class="serif text-[20px] mb-1">加入成員</h3>
+        <p class="text-[13px] text-ink2">輸入四位數密碼，就能新增和修改行程、便利貼、購物清單與花費。</p>
         <div class="flex justify-center gap-3 my-5">
-          <div v-for="i in 4" :key="i" class="w-12 h-14 rounded-2xl bg-white/80 grid place-items-center text-2xl font-bold" :style="{outline: pin.length===i-1 ? '2px solid var(--accent)' : 'none'}">{{ pin[i-1] ? '•' : '' }}</div>
+          <div v-for="i in 4" :key="i" class="w-12 h-14 rounded-2xl bg-white border flex items-center justify-center serif text-[24px]"
+               :class="mform.pin.length===i-1 ? 'border-[#7D9E88]' : 'border-[rgba(61,74,71,.12)]'">{{ mform.pin[i-1] ? '●' : '' }}</div>
         </div>
-        <div class="text-center text-sm text-[#d16565] h-5">{{ pinError }}</div>
-        <div class="grid grid-cols-3 gap-2 mt-2">
-          <button v-for="k in ['1','2','3','4','5','6','7','8','9','','0','⌫']" :key="k" class="h-14 rounded-2xl text-xl font-bold" :class="k ? 'bg-white/70 active:bg-white' : ''" @click="tapPin(k)" :disabled="!k">{{ k }}</button>
+        <p class="text-center text-[13px] text-[#C0736F] h-5">{{ mform.err }}</p>
+        <div class="grid grid-cols-3 gap-2.5 mt-1">
+          <button v-for="k in ['1','2','3','4','5','6','7','8','9','','0','⌫']" :key="k" :disabled="!k" @click="tapPin(k)"
+                  class="h-14 rounded-2xl text-[21px]" :class="k ? 'bg-white border border-[rgba(61,74,71,.10)] active:bg-[#EEF3EF]' : ''">{{ k }}</button>
         </div>
       </template>
 
       <template v-else>
-        <div class="flex flex-col items-center mt-3">
+        <h3 class="serif text-[20px] mb-4">{{ me ? '我的資料' : '設定暱稱與頭貼' }}</h3>
+        <div class="flex justify-center">
           <label class="relative cursor-pointer">
-            <img v-if="form.avatar" :src="form.avatar" class="avatar w-24 h-24" />
-            <span v-else class="avatar w-24 h-24 text-3xl" :style="{background: colorOf(form.id || 'new')}">{{ (form.name || '?').slice(0,1) }}</span>
-            <span class="absolute bottom-0 right-0 w-8 h-8 rounded-full grid place-items-center text-white text-sm" style="background: var(--accent)"><i class="fa-solid fa-camera"></i></span>
-            <input type="file" accept="image/*" class="hidden" @change="pickImage($event, 'avatar', 240)" />
+            <img v-if="mform.avatar" :src="mform.avatar" class="avatar w-24 h-24">
+            <span v-else class="avatar w-24 h-24 serif text-[34px]" :style="{background:colorOf(mform.id)}">{{ (mform.name || '?').slice(0,1) }}</span>
+            <span class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-[#7D9E88] text-white flex items-center justify-center" v-html="icons.camera"></span>
+            <input type="file" accept="image/*" class="hidden" @change="pickAvatar($event)">
           </label>
         </div>
-        <label class="field-label">暱稱</label>
-        <input class="field" v-model="form.name" maxlength="12" placeholder="大家怎麼叫你？" />
-        <div class="mt-5 space-y-2">
-          <button class="btn-main" @click="saveMember">{{ me ? '儲存' : '完成，開始編輯' }}</button>
-          <button v-if="me" class="btn-ghost" @click="logout">登出（變回瀏覽模式）</button>
+        <p class="text-center text-[12px] text-ink2 mt-2">點頭像換照片</p>
+        <div class="mt-3"><label class="fld">暱稱</label><input v-model="mform.name" maxlength="12" placeholder="大家怎麼叫你？"></div>
+        <div class="flex gap-3 mt-6">
+          <button @click="mform=null" class="flex-1 py-3 rounded-2xl bg-white border border-[rgba(61,74,71,.12)]">取消</button>
+          <button @click="saveMember()" class="flex-1 py-3 rounded-2xl bg-[#7D9E88] text-white">{{ me ? '儲存' : '完成' }}</button>
         </div>
-        <div v-if="store.members.length" class="mt-5">
-          <div class="text-xs text-[color:var(--ink-soft)] mb-2">旅伴們</div>
-          <div class="flex gap-3 flex-wrap">
-            <div v-for="m in store.members" :key="m.id" class="flex flex-col items-center w-14">
-              <img v-if="m.avatar" :src="m.avatar" class="avatar w-11 h-11" />
-              <span v-else class="avatar w-11 h-11" :style="{background: colorOf(m.id)}">{{ m.name.slice(0,1) }}</span>
-              <span class="text-[11px] mt-1 truncate w-full text-center">{{ m.name }}</span>
+        <button v-if="me" @click="logout()" class="w-full mt-3 py-3 rounded-2xl bg-[#F3F1EA] text-ink2">登出（變回只能瀏覽）</button>
+
+        <div v-if="members.length" class="mt-6">
+          <div class="text-[12.5px] text-ink2 mb-2">旅伴們</div>
+          <div class="flex flex-wrap gap-3">
+            <div v-for="m in members" :key="m.id" class="w-14 flex flex-col items-center">
+              <img v-if="m.avatar" :src="m.avatar" class="avatar w-11 h-11">
+              <span v-else class="avatar w-11 h-11 serif text-[17px]" :style="{background:colorOf(m.id)}">{{ m.name.slice(0,1) }}</span>
+              <span class="text-[11.5px] mt-1 w-full truncate text-center">{{ m.name }}</span>
             </div>
           </div>
         </div>
       </template>
     </div>
-  </transition>
+  </div>
 
-  <!-- 確認視窗（避免誤刪） -->
-  <transition name="fade">
-    <div v-if="confirmBox" class="fixed inset-0 z-50 grid place-items-center px-8" style="background: rgba(70,55,50,.35)">
-      <div class="w-full max-w-xs rounded-3xl p-5 text-center" style="background: var(--bg)">
-        <div class="w-12 h-12 rounded-full mx-auto grid place-items-center mb-3" style="background: #fde4e4"><i class="fa-regular fa-trash-can text-[#d16565]"></i></div>
-        <div class="font-bold">{{ confirmBox.title }}</div>
-        <div class="text-sm text-[color:var(--ink-soft)] mt-1">{{ confirmBox.msg }}</div>
-        <div class="grid grid-cols-2 gap-2 mt-5">
-          <button class="btn-ghost !py-2.5" @click="confirmBox.done(false)">取消</button>
-          <button class="btn-danger !py-2.5 !bg-[#e88080] !text-white" @click="confirmBox.done(true)">確定刪除</button>
-        </div>
-      </div>
-    </div>
-  </transition>
-
-  <transition name="fade"><div v-if="toastMsg" class="toast">{{ toastMsg }}</div></transition>
+  <!-- 小提示 -->
+  <div v-if="tip" class="fixed left-1/2 -translate-x-1/2 bottom-28 z-[70] px-4 py-2.5 rounded-full text-white text-[14px] whitespace-nowrap" style="background:rgba(61,74,71,.88)">{{ tip }}</div>
 </div>
 
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script>
-/* =========================================================
-   ① 雲端同步設定（選填）
-   沒填：資料只存在各自的手機裡。
-   填上 Firebase 設定：所有成員的行程、便利貼、花費會即時同步。
-   設定方式請看 README.md 的「步驟 B」。
-   ========================================================= */
-const FIREBASE_CONFIG = null;
-/* 範例（把 null 換成你自己的）：
-const FIREBASE_CONFIG = {
-  apiKey: "xxxx",
-  authDomain: "xxxx.firebaseapp.com",
-  projectId: "xxxx",
-  storageBucket: "xxxx.appspot.com",
-  messagingSenderId: "0000",
-  appId: "1:0000:web:xxxx"
+/* ========== 同步設定：把 Firebase 主控台給你的四個值貼進來 ========== */
+var FIREBASE = {
+  apiKey:      'AIzaSyC-rgz36_0Pbm6B-bPYZcKhHnUELMbaxVY',
+  authDomain:  'jiangnan-trip.firebaseapp.com',
+  databaseURL: 'https://jiangnan-trip-default-rtdb.asia-southeast1.firebasedatabase.app',
+  projectId:   'jiangnan-trip'
 };
-*/
+/* 同行的人打開同一個網址就會同步（越南行程用自己的代碼，不會跟上海的資料混在一起） */
+var TRIP_CODE = 'vn-1008-k7q2xw';
 
-/* ② 成員密碼 */
-const MEMBER_PIN = '0125';
+/* 成員密碼（四位數） */
+var MEMBER_PIN = '0125';
 
-/* ③ 旅行日期 */
-const TRIP_START = '2026-10-08';
-const TRIP_END = '2026-10-12';
+/* 頁首橫幅：依序嘗試這些檔名，上傳其中一個即可 */
+var BANNER_FILES = ['banner.jpg', 'banner.png', 'banner.jpeg', 'banner.webp'];
+/* ================================================================ */
 
-/* ④ 橫幅圖片：會依序嘗試以下檔名，上傳任一個即可 */
-const BANNER_FILES = ['banner.jpg', 'banner.png', 'banner.jpeg', 'banner.webp', 'Web app Banner 素材.png', 'Web app Banner 素材.jpg'];
-
-/* ⑤ 機場 */
-const AIRPORTS = {
-  TPE: { name: '桃園國際機場', q: 'Taiwan Taoyuan International Airport', lat: 25.0797, lng: 121.2342, tz: 8 },
-  SGN: { name: '胡志明 新山一機場', q: 'Tan Son Nhat International Airport', lat: 10.8172, lng: 106.6617, tz: 7 },
-};
-
-const FLIGHTS = [
-  { dir: '去程', dateLabel: '10/8 Thu', airline: '星宇航空', flightNo: 'JX711', from: 'TPE', to: 'SGN', dep: '07:40', arr: '10:15' },
-  { dir: '回程', dateLabel: '10/12 Mon', airline: '星宇航空', flightNo: 'JX714', from: 'SGN', to: 'TPE', dep: '18:05', arr: '22:35' },
-];
-
-/* ⑥ 住宿（phone 可自行補上，例如 '+84 254 xxx xxxx'） */
-const HOTELS = [
-  { name: 'Mercure Vung Tau', city: '頭頓 Vung Tau', nights: '10/8 – 10/9 · 1 晚', checkin: '2026-10-08', checkout: '2026-10-09',
-    address: '1 Thùy Vân, Thắng Tam, Vũng Tàu', phone: '',
-    mapUrl: 'https://maps.app.goo.gl/iCaq56GerCiG65267', navQuery: 'Mercure Vung Tau', lat: 10.3428, lng: 107.0880 },
-  { name: 'KOVA Hotel - Bui Vien Central', city: '胡志明市 Ho Chi Minh City', nights: '10/9 – 10/12 · 3 晚', checkin: '2026-10-09', checkout: '2026-10-12',
-    address: 'Bùi Viện, Phạm Ngũ Lão, Quận 1, TP. Hồ Chí Minh', phone: '',
-    mapUrl: 'https://maps.app.goo.gl/iGxNR9o1Qnbv4eZJ7', navQuery: 'KOVA Hotel Bui Vien Central', lat: 10.7673, lng: 106.6929 },
-];
-
-const CARS = [
-  { date: '10/8', wk: 'Thu', from: '新山一機場', to: 'Mercure Vung Tau', note: '機場接機，單程前往頭頓飯店' },
-  { date: '10/9', wk: 'Fri', from: 'Mercure Vung Tau', to: 'KOVA Hotel', note: '頭頓飯店單程前往胡志明市飯店' },
-];
-
-/* ⑦ 預設行程（第一次開啟時寫入，之後都可以在 App 裡修改） */
-const SEED_ITINERARY = [
-  { date: '2026-10-08', cat: '航班', flightNo: 'JX711', airline: '星宇航空', from: 'TPE', to: 'SGN', dep: '07:40', arr: '10:15', note: '' },
-  { date: '2026-10-08', cat: '其他', name: '包車接機 → 頭頓', time: '10:45', place: 'Tan Son Nhat International Airport', lat: 10.8172, lng: 106.6617, note: '包車單程：新山一機場 → Mercure Vung Tau' },
-  { date: '2026-10-08', cat: '住宿', name: 'Mercure Vung Tau', time: '', place: 'Mercure Vung Tau', mapUrl: 'https://maps.app.goo.gl/iCaq56GerCiG65267', lat: 10.3428, lng: 107.0880, hours: 'Check-in', note: '入住 1 晚' },
-  { date: '2026-10-09', cat: '其他', name: '包車 頭頓 → 胡志明市', time: '', place: 'Mercure Vung Tau', lat: 10.3428, lng: 107.0880, note: '包車單程：Mercure Vung Tau → KOVA Hotel' },
-  { date: '2026-10-09', cat: '住宿', name: 'KOVA Hotel - Bui Vien Central', time: '', place: 'KOVA Hotel Bui Vien Central', mapUrl: 'https://maps.app.goo.gl/iGxNR9o1Qnbv4eZJ7', lat: 10.7673, lng: 106.6929, hours: 'Check-in', note: '入住 3 晚（10/9–10/12）' },
-  { date: '2026-10-11', cat: '其他', name: '奧黛選衣 & 妝髮', time: '08:00', mapUrl: 'https://maps.app.goo.gl/2ZNkfM9EAgavtAdM7', noGeo: true, note: '08:00–10:00 選奧黛／妝髮\n總金額 7,300,000₫，已付訂金 4,900,000₫（NT$6,203）\n尾款 2,900,000₫ 付現金\n衣服當天下午 5 點或隔天歸還' },
-  { date: '2026-10-11', cat: '景點', name: '奧黛外拍', time: '10:00', mapUrl: 'https://maps.app.goo.gl/2ZNkfM9EAgavtAdM7', noGeo: true, note: '外出拍照約 1.5 小時' },
-  { date: '2026-10-11', cat: '美食', name: "Pizza 4P's", time: '18:30', mapUrl: 'https://maps.app.goo.gl/9k9K74R5KcHg7Y6E6', noGeo: true, hours: '', note: '已預約 18:30 · 4 位' },
-  { date: '2026-10-12', cat: '住宿', name: 'KOVA Hotel 退房', time: '', place: 'KOVA Hotel Bui Vien Central', mapUrl: 'https://maps.app.goo.gl/iGxNR9o1Qnbv4eZJ7', lat: 10.7673, lng: 106.6929, hours: 'Check-out', note: '' },
-  { date: '2026-10-12', cat: '航班', flightNo: 'JX714', airline: '星宇航空', from: 'SGN', to: 'TPE', dep: '18:05', arr: '22:35', note: '建議 15:00 前抵達機場' },
-];
-
-/* ---------- 以下為程式本體，一般不需要修改 ---------- */
-const CAT = {
-  '景點': { icon: 'fa-solid fa-camera-retro', color: 'var(--sky)' },
-  '住宿': { icon: 'fa-solid fa-bed', color: 'var(--lav)' },
-  '美食': { icon: 'fa-solid fa-utensils', color: 'var(--peach)' },
-  '購物': { icon: 'fa-solid fa-bag-shopping', color: 'var(--pink)' },
-  '航班': { icon: 'fa-solid fa-plane', color: 'var(--mint)' },
-  '其他': { icon: 'fa-solid fa-star', color: 'var(--butter)' },
-};
-const HAS_HOURS = ['景點', '住宿', '美食', '購物'];
-const EXP_CAT = {
-  '交通': { icon: 'fa-solid fa-car-side', color: 'var(--sky)' },
-  '飲食': { icon: 'fa-solid fa-utensils', color: 'var(--peach)' },
-  '住宿': { icon: 'fa-solid fa-bed', color: 'var(--lav)' },
-  '門票': { icon: 'fa-solid fa-ticket', color: 'var(--mint)' },
-  '購物': { icon: 'fa-solid fa-bag-shopping', color: 'var(--pink)' },
-  '其他': { icon: 'fa-solid fa-ellipsis', color: 'var(--butter)' },
-};
-const NOTE_COLORS = ['#fde7a9', '#fbd3dc', '#cdeadf', '#d9e8f8', '#e5dcf6', '#fde0cc'];
-const AVATAR_COLORS = ['#e8a0b0', '#9fcbb8', '#a9c4e4', '#c3b2e6', '#f0b896', '#d9c27a'];
-const TABS = [
-  { key: 'plan', label: '每日行程', en: 'Itinerary', icon: 'fa-solid fa-location-dot' },
-  { key: 'info', label: '旅行資訊', en: 'Information', icon: 'fa-solid fa-circle-info' },
-  { key: 'shop', label: '購物清單', en: 'Shopping', icon: 'fa-solid fa-basket-shopping' },
-  { key: 'note', label: '記事本', en: 'Notes', icon: 'fa-solid fa-note-sticky' },
-  { key: 'cost', label: '花費', en: 'Expenses', icon: 'fa-solid fa-sack-dollar' },
-];
-const WK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const COLS = ['itinerary', 'shopping', 'notes', 'expenses', 'members'];
-
-const pad = n => String(n).padStart(2, '0');
-const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-const parseYmd = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-const clone = o => JSON.parse(JSON.stringify(o));
-const lsGet = (k, def) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch (e) { return def; } };
-const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
-const loadScript = src => new Promise((ok, fail) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = fail; document.head.appendChild(s); });
-
-const DAYS = [];
-for (let d = parseYmd(TRIP_START); d <= parseYmd(TRIP_END); d.setDate(d.getDate() + 1)) {
-  DAYS.push({ date: ymd(d), wk: WK[d.getDay()], m: d.getMonth() + 1, d: d.getDate() });
-}
-
-function parseCoord(text) {
-  if (!text) return null;
-  const m = String(text).match(/(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/) || String(text).match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
-  return m ? { lat: +m[1], lng: +m[2] } : null;
-}
-function haversine(a, b) {
-  const R = 6371, r = x => x * Math.PI / 180;
-  const dLat = r(b.lat - a.lat), dLng = r(b.lng - a.lng);
-  const h = Math.sin(dLat / 2) ** 2 + Math.cos(r(a.lat)) * Math.cos(r(b.lat)) * Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(h));
-}
-function minText(min) {
-  min = Math.max(1, Math.round(min));
-  if (min < 60) return `${min} 分`;
-  const h = Math.floor(min / 60), m = min % 60;
-  return m ? `${h} 小時 ${m} 分` : `${h} 小時`;
-}
-function compressImage(file, max, quality = 0.72) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file), img = new Image();
-    img.onload = () => {
-      const s = Math.min(1, max / Math.max(img.width, img.height));
-      const c = document.createElement('canvas');
-      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      URL.revokeObjectURL(url);
-      resolve(c.toDataURL('image/jpeg', quality));
-    };
-    img.onerror = reject;
-    img.src = url;
+var fbRef = null, pushTimer = null;
+function loadScript(src) {
+  return new Promise(function (ok, no) {
+    var el = document.createElement('script');
+    el.src = src; el.onload = ok; el.onerror = no;
+    document.head.appendChild(el);
   });
 }
 
-const { createApp, ref, reactive, computed, watch, nextTick, onMounted } = Vue;
+/* ---------- 小工具：離線也不會壞掉的儲存 ---------- */
+var mem = {};
+var store = {
+  get: function (k, d) {
+    try { var v = localStorage.getItem('vn-' + k); return v ? JSON.parse(v) : (mem[k] !== undefined ? mem[k] : d); }
+    catch (e) { return mem[k] !== undefined ? mem[k] : d; }
+  },
+  set: function (k, v) {
+    mem[k] = v;
+    try { localStorage.setItem('vn-' + k, JSON.stringify(v)); } catch (e) {}
+  }
+};
+var uid = function () { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); };
+var DEVICE = store.get('dev', ''); if (!DEVICE) { DEVICE = uid(); store.set('dev', DEVICE); }
 
-createApp({
-  setup() {
-    /* ---------- 資料儲存（本機 or Firebase） ---------- */
-    const store = reactive({ itinerary: [], shopping: [], notes: [], expenses: [], members: [] });
-    const cloud = ref(false);
-    let fdb = null;
-    const LS_DATA = 'vn-trip-data-v1';
+/* ---------- 每天的城市與座標（用來抓天氣、地圖搜尋） ---------- */
+var CITY = {
+  '2026-10-08': ['頭頓', 10.346, 107.084, 'Vung Tau'],
+  '2026-10-09': ['頭頓 → 胡志明市', 10.776, 106.700, 'Ho Chi Minh City'],
+  '2026-10-10': ['胡志明市', 10.776, 106.700, 'Ho Chi Minh City'],
+  '2026-10-11': ['胡志明市', 10.776, 106.700, 'Ho Chi Minh City'],
+  '2026-10-12': ['胡志明市', 10.776, 106.700, 'Ho Chi Minh City']
+};
 
-    function persistLocal() {
-      if (!lsSet(LS_DATA, store)) toast('手機儲存空間不足，請刪除部分圖片');
-    }
-    const api = {
-      save(col, item) {
-        const data = clone(item);
-        const arr = store[col], i = arr.findIndex(x => x.id === data.id);
-        if (i >= 0) arr[i] = data; else arr.push(data);
-        if (fdb) fdb.collection(col).doc(data.id).set(data).catch(e => toast('同步失敗：' + e.message));
-        else persistLocal();
-      },
-      remove(col, id) {
-        store[col] = store[col].filter(x => x.id !== id);
-        if (fdb) fdb.collection(col).doc(id).delete();
-        else persistLocal();
-      },
-      addComment(note, c) {
-        note.comments = [...(note.comments || []), c];
-        if (fdb) fdb.collection('notes').doc(note.id).update({ comments: firebase.firestore.FieldValue.arrayUnion(c) });
-        else persistLocal();
-      },
-    };
-    const seedItems = () => SEED_ITINERARY.map((x, i) => ({ id: uid() + i, order: i, ...x }));
+var URL_MERCURE = 'https://maps.app.goo.gl/iCaq56GerCiG65267';
+var URL_KOVA = 'https://maps.app.goo.gl/iGxNR9o1Qnbv4eZJ7';
+var URL_AODAI = 'https://maps.app.goo.gl/2ZNkfM9EAgavtAdM7';
+var URL_PIZZA = 'https://maps.app.goo.gl/9k9K74R5KcHg7Y6E6';
 
-    async function initData() {
-      if (FIREBASE_CONFIG) {
-        try {
-          await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
-          await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js');
-          firebase.initializeApp(FIREBASE_CONFIG);
-          fdb = firebase.firestore();
-          fdb.enablePersistence({ synchronizeTabs: true }).catch(() => {});
-          cloud.value = true;
-          COLS.forEach(col => fdb.collection(col).onSnapshot(snap => {
-            store[col] = snap.docs.map(d => ({ ...d.data(), id: d.id }));
-          }));
-          const meta = fdb.collection('meta').doc('seed');
-          const snap = await meta.get();
-          if (!snap.exists) {
-            await meta.set({ at: Date.now() });
-            const batch = fdb.batch();
-            seedItems().forEach(it => batch.set(fdb.collection('itinerary').doc(it.id), it));
-            await batch.commit();
-          }
-          return;
-        } catch (e) {
-          console.error(e); fdb = null; cloud.value = false;
-          toast('雲端連線失敗，改用本機資料');
-        }
-      }
-      const saved = lsGet(LS_DATA, null);
-      if (saved) COLS.forEach(c => store[c] = saved[c] || []);
-      else { store.itinerary = seedItems(); persistLocal(); }
-    }
+var P = function (n, cat, lat, lng, o) {
+  var x = { id: uid(), name: n, cat: cat, lat: lat, lng: lng, hours: '', ticket: '', note: '', url: '' };
+  for (var k in (o || {})) x[k] = o[k];
+  return x;
+};
 
-    /* ---------- 共用 ---------- */
-    const tab = ref(lsGet('vn-trip-tab', 'plan'));
-    const currentTab = computed(() => TABS.find(t => t.key === tab.value) || TABS[0]);
-    const toastMsg = ref('');
-    let toastTimer;
-    function toast(m) { toastMsg.value = m; clearTimeout(toastTimer); toastTimer = setTimeout(() => toastMsg.value = '', 2200); }
-    const fmt = n => (n || n === 0) && n !== '' ? Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 }) : '';
-    const toNum = s => { const v = String(s).replace(/[^\d.]/g, ''); return v === '' ? '' : Number(v); };
-    const shortVnd = n => n >= 1000000 ? (n / 1000000) + 'M' : (n / 1000) + 'K';
-    const sheet = ref(null);
-    const form = reactive({});
-    const setForm = obj => { Object.keys(form).forEach(k => delete form[k]); Object.assign(form, obj); };
+var SEED = {
+  '2026-10-08': [
+    { id: uid(), cat: '航班', name: 'JX711 星宇航空', from: 'TPE', to: 'SGN', dep: '07:40', arr: '10:15', dur: '3h35m', note: '桃園 → 胡志明市新山一機場（當地時間）', q: 'Taiwan Taoyuan International Airport' },
+    P('包車接機 → 頭頓', '其他', 10.817, 106.662, { q: 'Tan Son Nhat International Airport', note: '新山一機場接機，單程前往 Mercure Vung Tau' }),
+    P('Mercure Vung Tau', '住宿', 10.343, 107.088, { url: URL_MERCURE, hours: 'Check-in', mode: 'car', mins: 120, note: '10/8 一晚' })
+  ],
+  '2026-10-09': [
+    P('包車 頭頓 → 胡志明市', '其他', 10.343, 107.088, { q: 'Mercure Vung Tau', note: '從頭頓飯店單程前往胡志明市飯店' }),
+    P('KOVA Hotel - Bui Vien Central', '住宿', 10.767, 106.693, { url: URL_KOVA, hours: 'Check-in', mode: 'car', mins: 150, note: '10/9–10/12 三晚' })
+  ],
+  '2026-10-10': [],
+  '2026-10-11': [
+    P('奧黛選衣 & 妝髮', '其他', null, null, { url: URL_AODAI, hours: '08:00–10:00', note: '總金額 7,300,000₫，已付訂金 4,900,000₫（NT$6,203）\n尾款 2,900,000₫ 付現金\n衣服當天下午 5 點前或隔天歸還' }),
+    P('奧黛外拍', '景點', null, null, { url: URL_AODAI, hours: '10:00 出發，約 1.5 小時' }),
+    P("Pizza 4P's", '美食', null, null, { url: URL_PIZZA, hours: '18:30 已訂位', note: '4 位' })
+  ],
+  '2026-10-12': [
+    P('KOVA Hotel 退房', '其他', 10.767, 106.693, { url: URL_KOVA }),
+    P('前往新山一機場', '其他', 10.817, 106.662, { q: 'Tan Son Nhat International Airport', mode: 'taxi', mins: 40, note: '國際線建議 15:00 前抵達機場' }),
+    { id: uid(), cat: '航班', name: 'JX714 星宇航空', from: 'SGN', to: 'TPE', dep: '18:05', arr: '22:35', dur: '3h30m', note: '胡志明市 → 桃園（當地時間）', q: 'Tan Son Nhat International Airport' }
+  ]
+};
 
-    const confirmBox = ref(null);
-    const askConfirm = (title, msg) => new Promise(res => {
-      confirmBox.value = { title, msg, done: ok => { confirmBox.value = null; res(ok); } };
+var DOW = [['Sun', '日'], ['Mon', '一'], ['Tue', '二'], ['Wed', '三'], ['Thu', '四'], ['Fri', '五'], ['Sat', '六']];
+
+/* 每天晚上住哪裡：[名稱, 備註, Google 地圖連結] */
+var STAY = {
+  '2026-10-08': ['Mercure Vung Tau', '10/8 一晚', URL_MERCURE],
+  '2026-10-09': ['KOVA Hotel - Bui Vien Central', '10/9–10/12 三晚', URL_KOVA],
+  '2026-10-10': ['KOVA Hotel - Bui Vien Central', '第 2 晚', URL_KOVA],
+  '2026-10-11': ['KOVA Hotel - Bui Vien Central', '第 3 晚', URL_KOVA]
+};
+/* 缺住宿卡片的日子補上，已經有的不動 */
+function ensureStay(map) {
+  var n = 0;
+  Object.keys(STAY).forEach(function (d) {
+    var a = map[d]; if (!a) { return; }
+    if (a.some(function (x) { return x.cat === '住宿'; })) { return; }
+    a.push(P(STAY[d][0], '住宿', null, null, { note: STAY[d][1], url: STAY[d][2] || '' }));
+    n++;
+  });
+  return n;
+}
+ensureStay(SEED);
+
+/* 每天的住宿卡片一律排到最後 */
+Object.keys(SEED).forEach(function (d) {
+  var a = SEED[d];
+  SEED[d] = a.filter(function (x) { return x.cat !== '住宿'; })
+             .concat(a.filter(function (x) { return x.cat === '住宿'; }));
+});
+
+/* 原封不動的原始行程，重設時用它還原 */
+var SEED_RAW = JSON.stringify(SEED);
+var toastTimer = null, tipTimer = null;
+var AVATAR_COLORS = ['#E3A8B4', '#8FAE93', '#A8C4CE', '#C9A98C', '#B7A6D6', '#D9B26F'];
+
+var svg = function (p, w) {
+  return '<svg width="' + (w || 20) + '" height="' + (w || 20) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>';
+};
+
+Vue.createApp({
+  data: function () {
+    var days = Object.keys(CITY).map(function (d) {
+      var dt = new Date(d + 'T00:00:00');
+      return { date: d, dow: DOW[dt.getDay()][0], zh: DOW[dt.getDay()][1], dd: Number(d.slice(8)) };
     });
-
-    const today = ymd(new Date());
-    const countdown = computed(() => {
-      const diff = Math.round((parseYmd(TRIP_START) - parseYmd(today)) / 86400000);
-      if (diff > 0) return `出發倒數 ${diff} 天`;
-      if (today <= TRIP_END) return `旅行第 ${DAYS.findIndex(d => d.date === today) + 1} 天`;
-      return '';
-    });
-    const dateLabel = s => { const d = parseYmd(s); return `${d.getMonth() + 1}/${d.getDate()} ${WK[d.getDay()]}`; };
-    const timeLabel = t => { const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
-
-    /* ---------- 橫幅 ---------- */
-    const bannerIdx = ref(0);
-    const bannerSrc = computed(() => BANNER_FILES[bannerIdx.value] || '');
-    const nextBanner = () => bannerIdx.value++;
-    function onBannerLoad(e) {
-      // 取圖片最下面幾排像素的平均色，當作整頁背景色
-      try {
-        const img = e.target, c = document.createElement('canvas'), W = 60, H = 40;
-        c.width = W; c.height = H;
-        const ctx = c.getContext('2d');
-        ctx.drawImage(img, 0, 0, W, H);
-        const px = ctx.getImageData(0, H - 3, W, 3).data;
-        let r = 0, g = 0, b = 0, n = 0;
-        for (let i = 0; i < px.length; i += 4) { r += px[i]; g += px[i + 1]; b += px[i + 2]; n++; }
-        const col = `rgb(${Math.round(r / n)}, ${Math.round(g / n)}, ${Math.round(b / n)})`;
-        document.documentElement.style.setProperty('--bg', col);
-        document.querySelector('meta[name=theme-color]').setAttribute('content', col);
-      } catch (err) { /* 本機直接開檔案時瀏覽器不允許讀取像素，沒關係 */ }
-    }
-    const bannerEl = ref(null);
-    const tabsStuck = ref(false);
-    onMounted(() => {
-      new IntersectionObserver(([en]) => tabsStuck.value = !en.isIntersecting, { threshold: 0.08 }).observe(bannerEl.value);
-    });
-    function goTab(k) {
-      tab.value = k; lsSet('vn-trip-tab', k);
-      if (tabsStuck.value) window.scrollTo({ top: bannerEl.value.offsetHeight - 70, behavior: 'smooth' });
-    }
-
-    /* ---------- 成員 ---------- */
-    const meId = ref(lsGet('vn-trip-me', null));
-    const me = computed(() => store.members.find(m => m.id === meId.value) || null);
-    const isEditor = computed(() => !!me.value);
-    const memberOf = id => store.members.find(m => m.id === id);
-    const colorOf = id => { let h = 0; for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return AVATAR_COLORS[h % AVATAR_COLORS.length]; };
-    const joinStep = ref(1), pin = ref(''), pinError = ref('');
-    function openMember() {
-      pin.value = ''; pinError.value = ''; joinStep.value = 1;
-      setForm(me.value ? clone(me.value) : { name: '', avatar: '' });
-      sheet.value = 'member';
-    }
-    function tapPin(k) {
-      pinError.value = '';
-      if (k === '⌫') { pin.value = pin.value.slice(0, -1); return; }
-      if (pin.value.length >= 4) return;
-      pin.value += k;
-      if (pin.value.length === 4) {
-        if (pin.value === MEMBER_PIN) setTimeout(() => joinStep.value = 2, 150);
-        else setTimeout(() => { pinError.value = '密碼不對，再試一次'; pin.value = ''; }, 200);
-      }
-    }
-    function saveMember() {
-      if (!form.name || !form.name.trim()) return toast('請輸入暱稱');
-      const m = { id: form.id || uid(), name: form.name.trim(), avatar: form.avatar || '' };
-      api.save('members', m);
-      meId.value = m.id; lsSet('vn-trip-me', m.id);
-      sheet.value = null; toast(`歡迎，${m.name}！`);
-    }
-    function logout() { meId.value = null; lsSet('vn-trip-me', null); sheet.value = null; toast('已切換為瀏覽模式'); }
-    function requireEditor() {
-      if (isEditor.value) return true;
-      toast('請先加入成員'); setTimeout(openMember, 300); return false;
-    }
-    async function pickImage(e, key, max) {
-      const f = e.target.files && e.target.files[0];
-      if (!f) return;
-      try { form[key] = await compressImage(f, max); } catch (err) { toast('圖片讀取失敗'); }
-      e.target.value = '';
-    }
-
-    /* ---------- 每日行程 ---------- */
-    const day = ref(DAYS.some(d => d.date === today) ? today : DAYS[0].date);
-    const dayIndex = computed(() => DAYS.findIndex(d => d.date === day.value));
-    const dayItems = computed(() => store.itinerary.filter(x => x.date === day.value).sort((a, b) => (a.order ?? 0) - (b.order ?? 0)));
-    const prevDate = s => { const d = parseYmd(s); d.setDate(d.getDate() - 1); return ymd(d); };
-    const hotelForNight = s => HOTELS.find(h => h.checkin <= s && s < h.checkout);
-    const cityOf = s => { const h = hotelForNight(s) || hotelForNight(prevDate(s)) || HOTELS[HOTELS.length - 1]; return { name: h.city, lat: h.lat, lng: h.lng }; };
-    const airportName = c => (AIRPORTS[c] && AIRPORTS[c].name) || c;
-    function flightDuration(f) {
-      const toMin = t => { const [h, m] = (t || '0:0').split(':').map(Number); return h * 60 + m; };
-      const tzF = (AIRPORTS[f.from] || {}).tz ?? 8, tzT = (AIRPORTS[f.to] || {}).tz ?? 8;
-      let d = (toMin(f.arr) - tzT * 60) - (toMin(f.dep) - tzF * 60);
-      if (d <= 0) d += 1440;
-      return `${Math.floor(d / 60)}h ${pad(d % 60)}m`;
-    }
-
-    // 地點座標：手動座標 → 連結裡的座標 → 自動搜尋（OpenStreetMap）
-    const geoCache = reactive(lsGet('vn-trip-geo', {}));
-    const geoQueue = []; let geoBusy = false;
-    const queryOf = it => (it.place || it.name || '').trim();
-    function coordsOf(it, role) {
-      if (it.cat === '航班') { const a = AIRPORTS[role === 'origin' ? it.to : it.from]; return a ? { lat: a.lat, lng: a.lng } : null; }
-      if (it.lat && it.lng) return { lat: it.lat, lng: it.lng };
-      const fromUrl = parseCoord(it.mapUrl); if (fromUrl) return fromUrl;
-      if (it.noGeo) return null;
-      const q = queryOf(it); if (!q) return null;
-      if (geoCache[q] !== undefined) return geoCache[q];
-      if (!geoQueue.includes(q)) { geoQueue.push(q); runGeo(); }
-      return null;
-    }
-    async function runGeo() {
-      if (geoBusy) return; geoBusy = true;
-      while (geoQueue.length) {
-        const q = geoQueue.shift();
-        try {
-          const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=vn&q=${encodeURIComponent(q)}`);
-          const j = await r.json();
-          geoCache[q] = j[0] ? { lat: +j[0].lat, lng: +j[0].lon } : null;
-          lsSet('vn-trip-geo', geoCache);
-        } catch (e) { /* 離線時略過 */ }
-        await new Promise(r => setTimeout(r, 1100));
-      }
-      geoBusy = false;
-    }
-    const linkPoint = (it, role) => {
-      if (it.hotelRef) return it.navQuery;
-      if (it.cat === '航班') { const a = AIRPORTS[role === 'origin' ? it.to : it.from]; return a ? a.q : ''; }
-      return queryOf(it);
-    };
-    const dirUrl = (o, d, mode) => `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(o)}&destination=${encodeURIComponent(d)}&travelmode=${mode}`;
-    const navUrl = q => `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(q)}`;
-    function placeUrl(it) {
-      if (it.mapUrl) return it.mapUrl;
-      if (it.cat === '航班') return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(AIRPORTS[it.from]?.q || it.from)}`;
-      if (it.lat && it.lng && !it.place) return `https://www.google.com/maps/search/?api=1&query=${it.lat},${it.lng}`;
-      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryOf(it))}`;
-    }
-    const openPlace = it => window.open(placeUrl(it), '_blank');
-
-    function estimate(a, b, oName, dName) {
-      const km = haversine(a, b) * 1.35; // 直線距離 × 道路係數
-      if (km < 0.15) return { near: true };
-      const drive = km > 30 ? km / 50 * 60 + 10 : km / 20 * 60 + 4;
-      const walk = km / 4.5 * 60;
-      const transit = km / 13 * 60 + 10;
-      const best = km <= 1.2 ? 'walking' : 'driving';
-      const modes = [];
-      if (km <= 5) modes.push({ mode: 'walking', icon: 'fa-solid fa-person-walking', text: minText(walk) });
-      modes.push({ mode: 'driving', icon: 'fa-solid fa-car', text: minText(drive) });
-      modes.push({ mode: 'transit', icon: 'fa-solid fa-bus', text: minText(transit) });
-      modes.forEach(m => { m.best = m.mode === best; m.url = dirUrl(oName, dName, m.mode); });
-      return { est: true, km: km < 10 ? km.toFixed(1) : Math.round(km), modes };
-    }
-    const segments = computed(() => {
-      Object.keys(geoCache).length; // 座標查到後重新計算
-      return dayItems.value.map((it, i) => {
-        let from, label = '';
-        if (i === 0) {
-          const h = hotelForNight(prevDate(day.value));
-          if (!h || it.cat === '航班' && it.from !== 'SGN') return null;
-          from = { lat: h.lat, lng: h.lng, hotelRef: true, navQuery: h.navQuery, name: h.name };
-          label = `從 ${h.name} 出發`;
-          if (h.navQuery === it.place) return null;
-        } else from = dayItems.value[i - 1];
-        const a = from.hotelRef ? from : coordsOf(from, 'origin');
-        const b = coordsOf(it, 'dest');
-        const oName = linkPoint(from, 'origin'), dName = linkPoint(it, 'dest');
-        if (a && b) return { label, ...estimate(a, b, oName, dName) };
-        if (it.mapUrl && !it.place && it.cat !== '航班') return { label, msg: '開啟地點，查看路線', url: it.mapUrl };
-        return { label, msg: 'Google 地圖查看路線', url: dirUrl(oName, dName, 'driving') };
-      });
-    });
-
-    function addItem() {
-      if (!requireEditor()) return;
-      setForm({ cat: '景點', date: day.value, name: '', time: '', hours: '', ticket: '', place: '', mapUrl: '', coord: '', note: '', flightNo: '', airline: '', from: '', to: '', dep: '', arr: '' });
-      sheet.value = 'item';
-    }
-    function editItem(it) {
-      if (!requireEditor()) return;
-      setForm({ ...clone(it), coord: it.lat && it.lng ? `${it.lat}, ${it.lng}` : '' });
-      sheet.value = 'item';
-    }
-    function saveItem() {
-      if (form.cat === '航班' ? !form.flightNo : !(form.name || '').trim()) return toast(form.cat === '航班' ? '請輸入航班編號' : '請輸入名稱');
-      const data = clone(form);
-      const c = parseCoord(data.coord); delete data.coord;
-      if (c) { data.lat = c.lat; data.lng = c.lng; } else { delete data.lat; delete data.lng; }
-      if (data.cat === '航班') { data.from = (data.from || '').toUpperCase(); data.to = (data.to || '').toUpperCase(); data.name = data.flightNo; }
-      data.noGeo = !!data.noGeo && !data.place && !c;
-      const old = store.itinerary.find(x => x.id === data.id);
-      if (!data.id || !old || old.date !== data.date) {
-        const same = store.itinerary.filter(x => x.date === data.date);
-        data.order = same.length ? Math.max(...same.map(x => x.order ?? 0)) + 1 : 0;
-      }
-      data.id = data.id || uid();
-      api.save('itinerary', data);
-      sheet.value = null; toast('已儲存');
-    }
-    async function deleteItem() {
-      if (await askConfirm('刪除這個行程？', `「${form.name || form.flightNo}」刪除後無法復原`)) {
-        api.remove('itinerary', form.id); sheet.value = null; toast('已刪除');
-      }
-    }
-
-    // 拖曳排序
-    const planList = ref(null), listKey = ref(0);
-    let sortable = null;
-    function initSortable() {
-      if (sortable) { sortable.destroy(); sortable = null; }
-      if (!planList.value || !isEditor.value) return;
-      sortable = Sortable.create(planList.value, {
-        handle: '.drag-handle', draggable: '.it-item', animation: 200, forceFallback: true, fallbackTolerance: 3,
-        onEnd(evt) {
-          const o = evt.oldDraggableIndex, n = evt.newDraggableIndex;
-          if (o === n) return;
-          const arr = [...dayItems.value];
-          const [moved] = arr.splice(o, 1); arr.splice(n, 0, moved);
-          listKey.value++; // 讓畫面依資料重新繪製
-          arr.forEach((it, i) => { if (it.order !== i) api.save('itinerary', { ...it, order: i }); });
-          nextTick(initSortable);
-        },
-      });
-    }
-    watch([tab, day, isEditor, () => dayItems.value.length], () => nextTick(initSortable));
-    onMounted(() => nextTick(initSortable));
-
-    // 選到的日期自動捲到中間
-    const dayBar = ref(null);
-    watch(day, () => nextTick(() => {
-      const el = dayBar.value && dayBar.value.children[dayIndex.value];
-      if (el) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    }));
-
-    /* ---------- 天氣（Open-Meteo，免金鑰） ---------- */
-    const weather = reactive({});
-    async function loadWeather(dateStr) {
-      const c = cityOf(dateStr), key = dateStr;
-      if (weather[key] && weather[key].state !== 'error') return;
-      weather[key] = { state: 'loading' };
-      const diff = Math.round((parseYmd(dateStr) - parseYmd(today)) / 86400000);
-      if (diff > 15) { weather[key] = { state: 'far', diff }; return; }
-      if (diff < 0) { weather[key] = { state: 'past' }; return; }
-      try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lng}&timezone=Asia%2FHo_Chi_Minh` +
-          `&current=temperature_2m,apparent_temperature,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,precipitation_probability_max&start_date=${dateStr}&end_date=${dateStr}`;
-        const j = await (await fetch(url)).json();
-        weather[key] = { state: 'ok', isToday: diff === 0, cur: j.current, daily: { code: j.daily.weather_code[0], max: j.daily.temperature_2m_max[0], min: j.daily.temperature_2m_min[0], feel: j.daily.apparent_temperature_max[0], rain: j.daily.precipitation_probability_max[0] } };
-      } catch (e) { weather[key] = { state: 'error' }; }
-    }
-    function wxIcon(code) {
-      if ([71, 73, 75, 77, 85, 86].includes(code)) return { icon: 'fa-solid fa-snowflake', desc: '下雪', color: '#7fa7d6', bg: 'var(--sky)' };
-      if (code >= 51) return { icon: 'fa-solid fa-cloud-showers-heavy', desc: code >= 95 ? '雷陣雨' : '下雨', color: '#7b9fd0', bg: 'var(--sky)' };
-      if (code >= 2) return { icon: 'fa-solid fa-cloud', desc: code === 2 ? '多雲' : code >= 45 ? '有霧' : '陰天', color: '#9aa6b8', bg: '#e9eef5' };
-      return { icon: 'fa-solid fa-sun', desc: code === 1 ? '晴時多雲' : '晴天', color: '#f0b04a', bg: 'var(--butter)' };
-    }
-    watch(day, d => loadWeather(d), { immediate: true });
-    const weatherView = computed(() => {
-      const w = weather[day.value] || { state: 'loading' }, city = cityOf(day.value).name;
-      const base = { icon: 'fa-solid fa-cloud-sun', color: '#e3b56a', bg: 'var(--butter)' };
-      if (w.state === 'ok') {
-        const d = w.daily;
-        if (w.isToday && w.cur) {
-          const ic = wxIcon(w.cur.weather_code);
-          return { ok: true, ...ic, temp: Math.round(w.cur.temperature_2m) + '°', feel: Math.round(w.cur.apparent_temperature) + '°', note: `今日 ${Math.round(d.min)}°–${Math.round(d.max)}° · 降雨 ${d.rain ?? 0}%` };
-        }
-        const ic = wxIcon(d.code);
-        return { ok: true, ...ic, temp: `${Math.round(d.min)}°–${Math.round(d.max)}°`, feel: Math.round(d.feel) + '°', note: `降雨機率 ${d.rain ?? 0}%` };
-      }
-      const msg = { loading: '天氣載入中…', far: `${city} 的預報會在出發前約兩週開放`, past: '這天已經過去囉', error: '天氣暫時無法取得（可能沒有網路）' }[w.state];
-      return { ok: false, ...base, msg };
-    });
-
-    /* ---------- 匯率 ---------- */
-    const rateCache = lsGet('vn-trip-rate', null);
-    const rate = ref(rateCache ? rateCache.rate : 6203 / 4900000);
-    const rateDate = ref(rateCache ? rateCache.date : '');
-    const vndInput = ref(100000);
-    const rateLabel = computed(() => rateDate.value ? `匯率更新：${rateDate.value}` : '使用預設匯率（離線）');
-    async function loadRate() {
-      try {
-        const j = await (await fetch('https://open.er-api.com/v6/latest/VND')).json();
-        if (j.rates && j.rates.TWD) { rate.value = j.rates.TWD; rateDate.value = ymd(new Date(j.time_last_update_unix * 1000)); }
-        else throw 0;
-      } catch (e) {
-        try {
-          const j = await (await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/vnd.json')).json();
-          rate.value = j.vnd.twd; rateDate.value = j.date;
-        } catch (e2) { return; }
-      }
-      lsSet('vn-trip-rate', { rate: rate.value, date: rateDate.value });
-    }
-
-    /* ---------- 購物 ---------- */
-    const sortedShopping = computed(() => [...store.shopping].sort((a, b) => (a.done - b.done) || (b.at - a.at)));
-    function addShop() { if (!requireEditor()) return; setForm({ name: '', img: '', done: false }); sheet.value = 'shop'; }
-    function editShop(s) { if (!requireEditor()) return; setForm(clone(s)); sheet.value = 'shop'; }
-    function saveShop() {
-      if (!(form.name || '').trim()) return toast('請輸入商品名稱');
-      api.save('shopping', { ...clone(form), id: form.id || uid(), by: form.by || meId.value, at: form.at || Date.now() });
-      sheet.value = null; toast('已加入清單');
-    }
-    function toggleShop(s) { if (!requireEditor()) return; api.save('shopping', { ...s, done: !s.done }); }
-    async function deleteShop() {
-      if (await askConfirm('刪除這個項目？', `「${form.name}」`)) { api.remove('shopping', form.id); sheet.value = null; }
-    }
-
-    /* ---------- 記事本 ---------- */
-    const sortedNotes = computed(() => [...store.notes].sort((a, b) => b.at - a.at));
-    const commentDraft = reactive({});
-    function addNote() { if (!requireEditor()) return; setForm({ text: '', color: NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)] }); sheet.value = 'note'; }
-    function saveNote() {
-      if (!(form.text || '').trim()) return toast('寫點什麼吧');
-      api.save('notes', { id: uid(), text: form.text.trim(), color: form.color, by: meId.value, at: Date.now(), comments: [] });
-      sheet.value = null;
-    }
-    function addComment(n) {
-      if (!requireEditor()) return;
-      const t = (commentDraft[n.id] || '').trim(); if (!t) return;
-      api.addComment(n, { id: uid(), by: meId.value, text: t, at: Date.now() });
-      commentDraft[n.id] = '';
-    }
-    async function removeNote(n) {
-      if (await askConfirm('撕掉這張便利貼？', '連同留言一起刪除，無法復原')) api.remove('notes', n.id);
-    }
-
-    /* ---------- 花費 ---------- */
-    const toTwd = e => e.cur === 'TWD' ? Number(e.amount) || 0 : (Number(e.amount) || 0) * rate.value;
-    const totalTwd = computed(() => store.expenses.reduce((s, e) => s + toTwd(e), 0));
-    const costByCat = computed(() => Object.keys(EXP_CAT).map(cat => ({ cat, twd: store.expenses.filter(e => e.cat === cat).reduce((s, e) => s + toTwd(e), 0) })).filter(c => c.twd > 0));
-    const costGroups = computed(() => {
-      const g = {};
-      store.expenses.forEach(e => (g[e.date] = g[e.date] || []).push(e));
-      return Object.keys(g).sort().reverse().map(date => ({ date, items: g[date].sort((a, b) => b.at - a.at), twd: g[date].reduce((s, e) => s + toTwd(e), 0) }));
-    });
-    function addExpense() { if (!requireEditor()) return; setForm({ cat: '飲食', name: '', date: ymd(new Date()), amount: '', cur: 'VND', pay: '現金', note: '' }); sheet.value = 'cost'; }
-    function editExpense(e) { if (!requireEditor()) return; setForm(clone(e)); sheet.value = 'cost'; }
-    function saveExpense() {
-      if (!form.amount) return toast('請輸入金額');
-      api.save('expenses', { ...clone(form), id: form.id || uid(), by: form.by || meId.value, at: form.at || Date.now() });
-      sheet.value = null; toast('已記帳');
-    }
-    async function deleteExpense() {
-      if (await askConfirm('刪除這筆花費？', `「${form.name || form.cat}」${fmt(form.amount)}`)) { api.remove('expenses', form.id); sheet.value = null; }
-    }
-
-    function addForTab() {
-      ({ plan: addItem, shop: addShop, note: addNote, cost: addExpense })[tab.value]();
-    }
-
-    onMounted(() => { initData(); loadRate(); });
-
     return {
-      TABS, DAYS, CAT, HAS_HOURS, EXP_CAT, NOTE_COLORS, FLIGHTS, HOTELS, CARS,
-      store, cloud, tab, currentTab, goTab, toastMsg, fmt, toNum, shortVnd, sheet, form, confirmBox, countdown, dateLabel, timeLabel,
-      bannerSrc, nextBanner, onBannerLoad, bannerEl, tabsStuck,
-      me, isEditor, memberOf, colorOf, joinStep, pin, pinError, openMember, tapPin, saveMember, logout, requireEditor, pickImage,
-      day, dayIndex, dayItems, cityOf, airportName, flightDuration, segments, placeUrl, openPlace, navUrl,
-      addItem, editItem, saveItem, deleteItem, planList, listKey, dayBar, weatherView,
-      rate, vndInput, rateLabel,
-      sortedShopping, addShop, editShop, saveShop, toggleShop, deleteShop,
-      sortedNotes, commentDraft, addNote, saveNote, addComment, removeNote,
-      totalTwd, costByCat, costGroups, addExpense, editExpense, saveExpense, deleteExpense,
-      addForTab,
+      tab: 'plan',
+      days: days,
+      active: store.get('active', days[0].date),
+      items: store.get('items', JSON.parse(SEED_RAW)),
+      notes: store.get('notes', []),
+      openNote: {}, nform: null, askDelNote: false,
+      shop: store.get('shop', []),
+      costs: store.get('costs', []),
+      weather: {},
+      rate: store.get('rate', 6203 / 4900000),
+      rateNote: '離線暫用參考值',
+      vnd: '', twd: '',
+      members: store.get('members', []),
+      meId: store.get('me', ''),
+      mform: null, draft: {}, tip: '',
+      askDelShop: null, askDelCost: false,
+      bannerI: 0,
+      icons: {
+        userPlus: svg('<circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5M19 8v6M16 11h6"/>', 17),
+        send: svg('<path d="M4 12l16-8-6 16-2.5-6.5z"/>', 18),
+        camera: svg('<path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.2"/>', 16)
+      },
+      form: null, cform: null, sform: null, askDel: false,
+      confirmReset: false, msg: '',
+      sync: 'off', lastAt: 0, pushState: 'idle',
+      dragI: null, dragY: 0, dragStartY: 0,
+      cats: ['景點', '住宿', '美食', '購物', '航班', '其他'],
+      costCats: ['交通', '飲食', '住宿', '門票', '購物', '其他'],
+      tabs: [
+        { k: 'plan', label: '每日行程', icon: svg('<path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', 21) },
+        { k: 'note', label: '記事本', icon: svg('<path d="M6.5 3h8L19 7.5V20a1 1 0 0 1-1 1H6.5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5M9 12.5h6M9 16.5h4"/>', 21) },
+        { k: 'info', label: '資訊', icon: svg('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6v.1"/>', 21) },
+        { k: 'shop', label: '購物清單', icon: svg('<path d="M4 8h16l-1.6 10.2a2 2 0 0 1-2 1.8H7.6a2 2 0 0 1-2-1.8L4 8z"/><path d="M9 8a3 3 0 0 1 6 0"/>', 21) },
+        { k: 'cost', label: '花費', icon: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.8 1.8 0 0 1 0 3.6h-4M9.5 12h5"/>', 21) }
+      ],
+      flights: [
+        { id: 1, leg: '去程', date: '10/8（四）', name: '星宇航空 JX711', from: 'TPE', to: 'SGN', dep: '07:40', arr: '10:15', dur: '飛行 3h35m', note: '桃園國際機場 → 胡志明市新山一機場（皆為當地時間，越南比台灣慢 1 小時）' },
+        { id: 2, leg: '回程', date: '10/12（一）', name: '星宇航空 JX714', from: 'SGN', to: 'TPE', dep: '18:05', arr: '22:35', dur: '飛行 3h30m', note: '胡志明市新山一機場 → 桃園國際機場' }
+      ],
+      hotels: [
+        { name: 'Mercure Vung Tau', nights: '10/8–10/9　1 晚', tel: '', addr: '1 Thùy Vân, Thắng Tam, Vũng Tàu（頭頓後灘）', url: URL_MERCURE, q: 'Mercure Vung Tau' },
+        { name: 'KOVA Hotel - Bui Vien Central', nights: '10/9–10/12　3 晚', tel: '', addr: '胡志明市第一郡 Bùi Viện 背包客街一帶', url: URL_KOVA, q: 'KOVA Hotel Bui Vien Central' }
+      ],
+      cars: [
+        { date: '10/8', dow: 'Thu', from: '新山一機場', to: 'Mercure Vung Tau', note: '機場接機，單程前往頭頓飯店' },
+        { date: '10/9', dow: 'Fri', from: 'Mercure Vung Tau', to: 'KOVA Hotel', note: '頭頓飯店單程前往胡志明市飯店' }
+      ],
+      emerg: [
+        { num: '113', label: '報警（公安）' }, { num: '115', label: '救護車' },
+        { num: '114', label: '火警' },
+        { num: '+84903927019', show: '0903-927-019', label: '駐胡志明市台北經濟文化辦事處 急難救助' }
+      ]
     };
   },
+
+  computed: {
+    list: function () { return this.items[this.active] || []; },
+    me: function () { var id = this.meId; return this.members.find(function (m) { return m.id === id; }) || null; },
+    isEditor: function () { return !!this.me; },
+    bannerSrc: function () { return BANNER_FILES[this.bannerI] || ''; },
+    total: function () { return this.costs.reduce(function (s, c) { return s + Number(c.amt || 0); }, 0); }
+  },
+
+  mounted: function () { this.addStayEachDay(); this.moveStayLast(); this.getWeather(); this.getRate(); this.initSync(); },
+
+  methods: {
+    /* --- 基本 --- */
+    pick: function (d) { this.active = d; store.set('active', d); },
+    persist: function () { this.saveLocal(); },
+    saveLocal: function () {
+      store.set('items', this.items);
+      store.set('notes', this.notes);
+      store.set('shop', this.shop);
+      store.set('costs', this.costs);
+      store.set('members', this.members);
+      this.schedulePush();
+    },
+    cityOf: function (d) { return CITY[d] ? CITY[d][0] : ''; },
+    fx: function (v, r) { return v === '' || v === null ? '' : Math.round(Number(v) * r * 100) / 100; },
+
+    /* --- 地圖 --- */
+    gmap: function (name) { return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name); },
+    gnav: function (name) { return 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(name); },
+    openMap: function (it) {
+      if (it.url) { window.open(it.url, '_blank'); return; }
+      var c = CITY[this.active];
+      window.open(this.gmap(it.q || (it.name + (c ? ', ' + c[3] : ''))), '_blank');
+    },
+
+    /* --- 交通時間估算 --- */
+    leg: function (i) {
+      var cur = this.list[i];
+      if (!cur || cur.cat === '航班') return null;
+      if (cur.mins === undefined || cur.mins === '' || cur.mins === null) return null;
+      var mm = Number(cur.mins);
+      if (!mm || mm < 0) return null;
+      var L = { taxi: 'Grab', walk: '走路', train: '火車', metro: '捷運／公車', car: '包車', bus: '公車' };
+      var md = cur.mode || '';
+      return { mode: md, min: mm, text: (md ? L[md] + ' ' : '') + mm + ' 分' };
+    },
+
+    /* --- 圖示 --- */
+    moveIcon: function (m) {
+      if (m === 'walk') return svg('<circle cx="13" cy="4.5" r="1.6"/><path d="M11 21l1.5-5-2.5-2.5 1-4.5 3 2 2.5 1M9 21l2-5"/>', 16);
+      if (m === 'taxi' || m === 'car') return svg('<path d="M5 16h14M6.5 16V12l1.8-4h7.4l1.8 4v4"/><circle cx="8" cy="17.5" r="1.5"/><circle cx="16" cy="17.5" r="1.5"/>', 16);
+      if (m === 'train') return svg('<path d="M6 15V9.5C6 6 8.7 4 12 4s6 2 6 5.5V15a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M6.5 11h11M4.5 21l3-3M19.5 21l-3-3"/>', 16);
+      if (m === 'metro' || m === 'bus') return svg('<rect x="6" y="4" width="12" height="12" rx="2.5"/><path d="M6 10h12M8.5 20l1.5-2M15.5 20L14 18"/><circle cx="9" cy="13.5" r=".8" fill="currentColor"/><circle cx="15" cy="13.5" r=".8" fill="currentColor"/>', 16);
+      return svg('<path d="M12 5v14M8 15l4 4 4-4"/>', 16);
+    },
+    catIcon: function (c) {
+      var m = {
+        '景點': '<path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.3"/>',
+        '住宿': '<path d="M4 19V8l8-4 8 4v11"/><path d="M9 19v-5h6v5"/>',
+        '美食': '<path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M16 3c-1.5 2-2 4-2 6h4V3"/><path d="M7 11v10M16 9v12"/>',
+        '購物': '<path d="M4 8h16l-1.6 10.2a2 2 0 0 1-2 1.8H7.6a2 2 0 0 1-2-1.8L4 8z"/><path d="M9 8a3 3 0 0 1 6 0"/>',
+        '航班': '<path d="M21 16v-2l-8-5V4a1 1 0 0 0-2 0v5l-8 5v2l8-2.5V19l-2 1.5V22l3-1 3 1v-1.5L13 19v-5.5z"/>',
+        '交通': '<rect x="6" y="4" width="12" height="12" rx="2.5"/><path d="M6 10h12"/>',
+        '飲食': '<path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M16 3c-1.5 2-2 4-2 6h4V3"/><path d="M7 11v10M16 9v12"/>',
+        '門票': '<path d="M3 9V6h18v3a2.5 2.5 0 0 0 0 5v4H3v-4a2.5 2.5 0 0 0 0-5z"/>',
+        '其他': '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2"/>'
+      };
+      return '<span style="color:#5C7566">' + svg(m[c] || m['其他'], 19) + '</span>';
+    },
+    catBg: function (c) {
+      var m = { '景點': '#DCE9DE', '住宿': '#E2E9EE', '美食': '#F3E4D8', '購物': '#F2DEE3', '航班': '#E3E7EC', '其他': '#E9E7DE',
+                '交通': '#E2E9EE', '飲食': '#F3E4D8', '門票': '#DCE9DE' };
+      return m[c] || '#E9E7DE';
+    },
+    wxIcon: function (code) {
+      var g = '<span style="color:#8CA9B4">';
+      if (code === undefined || code === null) return g + svg('<circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/>', 40) + '</span>';
+      if (code >= 71 && code <= 79 || code === 85 || code === 86)
+        return g + svg('<path d="M12 4v16M5 8l14 8M19 8L5 16"/>', 40) + '</span>';
+      if (code >= 51 && code <= 67 || code >= 80 && code <= 82 || code >= 95)
+        return g + svg('<path d="M7 15a4 4 0 0 1 .6-8 5.5 5.5 0 0 1 10.4 1.8A3.2 3.2 0 0 1 17.5 15z"/><path d="M9 18l-1 2.5M13 18l-1 2.5M17 18l-1 2.5"/>', 40) + '</span>';
+      if (code >= 2 && code <= 48)
+        return g + svg('<path d="M7 17a4 4 0 0 1 .6-8 5.5 5.5 0 0 1 10.4 1.8A3.2 3.2 0 0 1 17.5 17z"/>', 40) + '</span>';
+      return '<span style="color:#E0B77E">' + svg('<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/>', 40) + '</span>';
+    },
+    wxText: function (c) {
+      if (c === 0) return '晴';
+      if (c <= 2) return '晴時多雲';
+      if (c === 3) return '陰';
+      if (c <= 48) return '有霧';
+      if (c <= 57) return '毛毛雨';
+      if (c <= 67) return '下雨';
+      if (c <= 77) return '下雪';
+      if (c <= 82) return '陣雨';
+      if (c <= 86) return '陣雪';
+      return '雷雨';
+    },
+
+    /* --- 天氣（Open-Meteo，免金鑰） --- */
+    getWeather: function () {
+      var self = this, seen = {};
+      this.days.forEach(function (d) {
+        var c = CITY[d.date], key = c[1] + ',' + c[2];
+        if (seen[key]) return; seen[key] = 1;
+        var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + c[1] + '&longitude=' + c[2] +
+          '&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max' +
+          '&timezone=Asia%2FHo_Chi_Minh&start_date=2026-10-08&end_date=2026-10-12';
+        fetch(url).then(function (r) { return r.json(); }).then(function (j) {
+          if (!j.daily) return;
+          j.daily.time.forEach(function (t, i) {
+            if (!CITY[t] || CITY[t][1] !== c[1]) return;
+            self.weather[t] = {
+              code: j.daily.weather_code[i],
+              text: self.wxText(j.daily.weather_code[i]),
+              max: Math.round(j.daily.temperature_2m_max[i]),
+              min: Math.round(j.daily.temperature_2m_min[i]),
+              feels: Math.round(j.daily.apparent_temperature_max[i])
+            };
+          });
+        }).catch(function () {});
+      });
+    },
+
+    /* --- 匯率 --- */
+    getRate: function () {
+      var self = this;
+      fetch('https://open.er-api.com/v6/latest/VND').then(function (r) { return r.json(); }).then(function (j) {
+        if (j && j.rates && j.rates.TWD) {
+          self.rate = j.rates.TWD; store.set('rate', j.rates.TWD);
+          self.rateNote = (j.time_last_update_utc || '').slice(5, 16) + ' 更新';
+        }
+      }).catch(function () {});
+    },
+
+    /* --- 多人同步 --- */
+    initSync: function () {
+      var self = this;
+      if (!FIREBASE.databaseURL || FIREBASE.databaseURL.indexOf('請貼上') === 0) { this.sync = 'off'; return; }
+      if (store.get('syncoff', 0)) { this.sync = 'paused'; return; }
+      this.sync = 'connecting';
+      var base = 'https://www.gstatic.com/firebasejs/10.12.2/';
+      loadScript(base + 'firebase-app-compat.js')
+        .then(function () { return loadScript(base + 'firebase-database-compat.js'); })
+        .then(function () {
+          firebase.initializeApp(FIREBASE);
+          fbRef = firebase.database().ref('trips/' + TRIP_CODE);
+          fbRef.on('value', function (snap) {
+            var d = snap.val();
+            self.sync = 'on';
+            if (!d) { self.pushNow(); return; }   // 雲端還是空的，把自己這份送上去
+            if (d.by === DEVICE) { self.mark('saved'); return; }  // 自己剛送出的
+            if (d.items) { self.items = d.items; }
+            self.notes = d.notes || [];
+            self.shop = d.shop || [];
+            self.costs = d.costs || [];
+            if (d.members) { self.members = d.members; store.set('members', self.members); }
+            store.set('items', self.items);
+            store.set('notes', self.notes);
+            store.set('shop', self.shop);
+            store.set('costs', self.costs);
+            self.mark('saved');
+          }, function () { self.sync = 'error'; });
+          firebase.database().ref('.info/connected').on('value', function (c) {
+            self.sync = c.val() ? 'on' : 'offline';
+          });
+        })
+        .catch(function () { self.sync = 'error'; });
+    },
+    schedulePush: function () {
+      if (!fbRef) { return; }
+      var self = this;
+      clearTimeout(pushTimer);
+      pushTimer = setTimeout(function () { self.pushNow(); }, 1200);
+    },
+    pushNow: function () {
+      if (!fbRef) { return; }
+      var self = this, at = Date.now();
+      this.lastAt = at;
+      this.mark('saving');
+      fbRef.set({
+        items: JSON.parse(JSON.stringify(this.items)),
+        notes: JSON.parse(JSON.stringify(this.notes)),
+        shop: JSON.parse(JSON.stringify(this.shop)),
+        costs: JSON.parse(JSON.stringify(this.costs)),
+        members: JSON.parse(JSON.stringify(this.members)),
+        at: at, by: DEVICE
+      }).then(function () { self.mark('saved'); })
+        .catch(function () { self.mark('fail'); });
+    },
+    mark: function (st) { this.pushState = st; },
+    badgeText: function () {
+      if (this.sync === 'connecting') { return '連線中'; }
+      if (this.sync === 'offline') { return '離線'; }
+      if (this.sync === 'error' || this.pushState === 'fail') { return '未同步'; }
+      if (this.pushState === 'saving') { return '傳送中'; }
+      if (this.pushState === 'saved') { return '已同步'; }
+      return '待同步';
+    },
+    badgeOk: function () { return this.sync === 'on' && this.pushState === 'saved'; },
+    badgeIcon: function () {
+      if (this.badgeOk()) {
+        return svg('<circle cx="12" cy="12" r="9"/><path d="M8.2 12.3l2.6 2.6 5-5.2"/>', 17);
+      }
+      if (this.pushState === 'saving') {
+        return svg('<path d="M12 4v3M12 17v3M4 12h3M17 12h3M6.3 6.3l2.1 2.1M15.6 15.6l2.1 2.1M17.7 6.3l-2.1 2.1M8.4 15.6l-2.1 2.1"/>', 17);
+      }
+      return svg('<path d="M7 17a4 4 0 0 1 .6-8 5.5 5.5 0 0 1 9.6.6"/><path d="M3.5 3.5l17 17"/>', 17);
+    },
+    syncText: function () {
+      return { off: '沒有設定同步，資料只留在這支手機',
+               paused: '同步已暫停',
+               connecting: '連線中…',
+               on: '已連線，改動會即時傳給同行的人',
+               offline: '目前離線，恢復連線後會自動補傳',
+               error: '連不上同步伺服器，先用本機資料' }[this.sync];
+    },
+    toggleSync: function () {
+      store.set('syncoff', store.get('syncoff', 0) ? 0 : 1);
+      location.reload();
+    },
+
+    /* --- 一次性補上：每天都要有當晚住宿 --- */
+    addStayEachDay: function () {
+      if (store.get('stayall', 0)) { return; }
+      if (ensureStay(this.items)) { this.persist(); }
+      store.set('stayall', 1);
+    },
+
+    /* --- 一次性搬移：把住宿卡片移到當天最後 --- */
+    moveStayLast: function () {
+      if (store.get('staylast', 0)) { return; }
+      var items = this.items, changed = false;
+      Object.keys(items).forEach(function (d) {
+        var a = items[d] || [];
+        var rest = a.filter(function (x) { return x.cat !== '住宿'; });
+        var stay = a.filter(function (x) { return x.cat === '住宿'; });
+        if (stay.length && rest.length && a[a.length - 1].cat !== '住宿') {
+          items[d] = rest.concat(stay); changed = true;
+        }
+      });
+      if (changed) { this.persist(); }
+      store.set('staylast', 1);
+    },
+
+    /* --- 重設與備份 --- */
+    toast: function (t) {
+      var self = this; this.msg = t;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { self.msg = ''; }, 4000);
+    },
+    doReset: function () {
+      this.items = JSON.parse(SEED_RAW);
+      this.persist();
+      this.confirmReset = false;
+      this.toast('行程已經回到最初的版本');
+    },
+    exportBackup: function () {
+      var data = { app: 'vietnam', v: 3, at: new Date().toISOString(), items: this.items, notes: this.notes, shop: this.shop, costs: this.costs, members: this.members };
+      var d = new Date();
+      var name = 'vietnam-' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') + '.json';
+      var url = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: 'application/json' }));
+      var a = document.createElement('a');
+      a.href = url; a.download = name;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 3000);
+      this.toast('備份檔已存出，檔名 ' + name);
+    },
+    importBackup: function (e) {
+      var f = e.target.files[0]; e.target.value = '';
+      if (!f) return;
+      var self = this, r = new FileReader();
+      r.onload = function (ev) {
+        try {
+          var d = JSON.parse(ev.target.result);
+          if (!d || !d.items) { self.toast('這不像是這個 App 的備份檔'); return; }
+          self.items = d.items;
+          self.notes = d.notes || self.notes;   // 舊版備份沒有筆記，保留現有的
+          self.shop = d.shop || [];
+          self.costs = d.costs || [];
+          if (d.members) { self.members = d.members; }
+          self.saveLocal();
+          self.toast('已經從備份還原');
+        } catch (err) { self.toast('檔案讀不出來，請確認選的是備份檔'); }
+      };
+      r.readAsText(f);
+    },
+
+    /* --- 行程 CRUD --- */
+    add: function () {
+      this.form = { isNew: true, id: uid(), date: this.active, src: this.active, cat: '景點',
+                    name: '', hours: '', ticket: '', note: '', mode: '', mins: '', url: '',
+                    from: '', to: '', dep: '', arr: '', dur: '' };
+    },
+    edit: function (it) {
+      this.form = Object.assign({ isNew: false, date: this.active, src: this.active }, it, { date: this.active });
+    },
+    save: function () {
+      var f = this.form; if (!f.name) { f.name = '未命名'; }
+      var to = f.date || this.active, from = f.src || this.active;
+      var o = Object.assign({}, f);
+      delete o.isNew; delete o.date; delete o.src;
+
+      if (!this.items[from]) { this.items[from] = []; }
+      if (!this.items[to]) { this.items[to] = []; }
+
+      if (to !== from) {                                   // 換到別天
+        this.items[from] = this.items[from].filter(function (x) { return x.id !== o.id; });
+        this.items[to] = this.items[to].concat([o]);
+      } else {
+        var arr = this.items[to].slice();
+        var i = arr.findIndex(function (x) { return x.id === o.id; });
+        if (i < 0) { arr.push(o); } else { arr[i] = Object.assign({}, arr[i], o); }
+        this.items[to] = arr;
+      }
+      this.persist();
+      this.form = null;
+      if (to !== this.active) { this.pick(to); }           // 跳到那天，看得到剛才加的
+    },
+    del: function () {
+      var id = this.form.id, d = this.form.src || this.active;
+      this.items[d] = (this.items[d] || []).filter(function (x) { return x.id !== id; });
+      this.persist(); this.askDel = false; this.form = null;
+    },
+
+    /* --- 拖曳排序 --- */
+    dragStart: function (e, i) { this.dragI = i; this.dragStartY = e.clientY; this.dragY = 0; e.currentTarget.setPointerCapture(e.pointerId); },
+    dragMove: function (e) {
+      if (this.dragI === null) return;
+      e.preventDefault();
+      this.dragY = e.clientY - this.dragStartY;
+      var cards = Array.prototype.slice.call(this.$refs.list.querySelectorAll('.trip-card'));
+      var cur = cards[this.dragI]; if (!cur) return;
+      var r = cur.getBoundingClientRect(), mid = r.top + r.height / 2, t = this.dragI, self = this;
+      cards.forEach(function (c, j) {
+        if (j === self.dragI) return;
+        var m = c.getBoundingClientRect(); var cm = m.top + m.height / 2;
+        if (j > self.dragI && mid > cm) t = Math.max(t, j);
+        if (j < self.dragI && mid < cm) t = Math.min(t, j);
+      });
+      if (t !== this.dragI) {
+        var arr = this.items[this.active].slice();
+        arr.splice(t, 0, arr.splice(this.dragI, 1)[0]);
+        this.items[this.active] = arr;
+        this.dragI = t; this.dragStartY = e.clientY; this.dragY = 0;
+      }
+    },
+    dragEnd: function () { if (this.dragI !== null) { this.dragI = null; this.dragY = 0; this.persist(); } },
+
+    /* --- 記事本 --- */
+    addNote: function () { this.nform = { isNew: true, id: uid(), title: '', body: '', by: this.meId, at: Date.now(), comments: [] }; },
+    editNote: function (n) { this.nform = Object.assign({ isNew: false }, n); },
+    saveNote: function () {
+      var f = this.nform;
+      if (!f.title && !f.body) { this.nform = null; return; }
+      var arr = this.notes.slice(), o = Object.assign({}, f); delete o.isNew;
+      var i = arr.findIndex(function (x) { return x.id === o.id; });
+      if (i < 0) { arr.unshift(o); } else { arr[i] = o; }
+      this.notes = arr; this.saveLocal(); this.nform = null;
+    },
+    delNote: function () {
+      var id = this.nform.id;
+      this.notes = this.notes.filter(function (x) { return x.id !== id; });
+      this.saveLocal(); this.askDelNote = false; this.nform = null;
+    },
+
+    /* --- 購物 --- */
+    addShop: function () { this.sform = { isNew: true, id: uid(), name: '', note: '', img: '', by: this.meId }; },
+    editShop: function (x) { this.sform = Object.assign({ isNew: false }, x); },
+    saveShop: function () {
+      var f = this.sform; if (!f.name) f.name = '未命名';
+      if (f.note === undefined) { f.note = ''; }
+      var arr = this.shop.slice(), o = Object.assign({}, f); delete o.isNew;
+      var i = arr.findIndex(function (x) { return x.id === o.id; });
+      if (i < 0) arr.push(o); else arr[i] = o;
+      this.shop = arr; this.saveLocal(); this.sform = null;
+    },
+    delShop: function (s) { this.shop = this.shop.filter(function (x) { return x.id !== s.id; }); this.saveLocal(); },
+    pic: function (e, target, maxSize) {
+      var file = e.target.files[0]; if (!file) return; var self = this;
+      var rd = new FileReader();
+      rd.onload = function (ev) {
+        var img = new Image();
+        img.onload = function () {
+          var max = maxSize || 700, s = Math.min(1, max / Math.max(img.width, img.height));
+          var cv = document.createElement('canvas');
+          cv.width = img.width * s; cv.height = img.height * s;
+          cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+          target.img = cv.toDataURL('image/jpeg', 0.75);
+          if (!target.isNew) { self.saveLocal(); }
+        };
+        img.src = ev.target.result;
+      };
+      rd.readAsDataURL(file);
+    },
+
+    /* --- 花費 --- */
+    addCost: function () {
+      var t = new Date(), iso = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+      this.cform = { isNew: true, id: uid(), cat: '飲食', name: '', date: CITY[iso] ? iso : this.active, amt: '', pay: '現金', note: '', by: this.meId };
+    },
+    editCost: function (c) { this.cform = Object.assign({ isNew: false }, c); },
+    saveCost: function () {
+      var f = this.cform; if (!f.name) f.name = '未命名';
+      var arr = this.costs.slice(), o = Object.assign({}, f); delete o.isNew;
+      var i = arr.findIndex(function (x) { return x.id === o.id; });
+      if (i < 0) arr.push(o); else arr[i] = o;
+      arr.sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+      this.costs = arr; this.saveLocal(); this.cform = null;
+    },
+    delCost: function () {
+      var id = this.cform.id;
+      this.costs = this.costs.filter(function (x) { return x.id !== id; });
+      this.saveLocal(); this.askDelCost = false; this.cform = null;
+    },
+
+    /* --- 橫幅：取圖片最下方的顏色當整頁底色 --- */
+    onBanner: function (e) {
+      try {
+        var img = e.target, cv = document.createElement('canvas'), W = 60, H = 40;
+        cv.width = W; cv.height = H;
+        var ctx = cv.getContext('2d'); ctx.drawImage(img, 0, 0, W, H);
+        var px = ctx.getImageData(0, H - 3, W, 3).data, r = 0, g = 0, b = 0, n = 0;
+        for (var i = 0; i < px.length; i += 4) { r += px[i]; g += px[i + 1]; b += px[i + 2]; n++; }
+        var col = 'rgb(' + Math.round(r / n) + ',' + Math.round(g / n) + ',' + Math.round(b / n) + ')';
+        document.documentElement.style.setProperty('--bgc', col);
+        document.querySelector('meta[name=theme-color]').setAttribute('content', col);
+      } catch (err) { /* 直接用電腦開檔案時讀不到像素，沒關係 */ }
+    },
+
+    /* --- 成員 --- */
+    say: function (t) {
+      var self = this; this.tip = t;
+      clearTimeout(tipTimer);
+      tipTimer = setTimeout(function () { self.tip = ''; }, 2200);
+    },
+    need: function () {
+      if (this.isEditor) { return true; }
+      this.say('先加入成員才能編輯喔');
+      this.openMember();
+      return false;
+    },
+    openMember: function () {
+      var m = this.me;
+      this.mform = m ? Object.assign({ step: 2, pin: '', err: '' }, m)
+                     : { step: 1, pin: '', err: '', id: uid(), name: '', avatar: '' };
+    },
+    tapPin: function (k) {
+      var f = this.mform; f.err = '';
+      if (k === '⌫') { f.pin = f.pin.slice(0, -1); return; }
+      if (f.pin.length >= 4) { return; }
+      f.pin += k;
+      if (f.pin.length === 4) {
+        setTimeout(function () {
+          if (f.pin === MEMBER_PIN) { f.step = 2; } else { f.err = '密碼不對，再試一次'; f.pin = ''; }
+        }, 180);
+      }
+    },
+    pickAvatar: function (e) { this.pic(e, this.mform, 240); },
+    saveMember: function () {
+      var f = this.mform, name = (f.name || '').trim();
+      if (!name) { this.say('請輸入暱稱'); return; }
+      var o = { id: f.id, name: name, avatar: f.avatar || '' };
+      var arr = this.members.slice(), i = arr.findIndex(function (x) { return x.id === o.id; });
+      if (i < 0) { arr.push(o); } else { arr[i] = o; }
+      this.members = arr;
+      this.meId = o.id; store.set('me', o.id);
+      this.saveLocal(); this.mform = null;
+      this.say('歡迎，' + name + '！');
+    },
+    logout: function () { this.meId = ''; store.set('me', ''); this.mform = null; this.say('已切換成瀏覽模式'); },
+    memberOf: function (id) { return this.members.find(function (m) { return m.id === id; }) || null; },
+    nameOf: function (id) { var m = this.memberOf(id); return m ? m.name : '旅伴'; },
+    colorOf: function (id) {
+      var h = 0, s = String(id || '');
+      for (var i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) >>> 0; }
+      return AVATAR_COLORS[h % AVATAR_COLORS.length];
+    },
+    timeText: function (t) {
+      if (!t) { return ''; }
+      var d = new Date(t);
+      return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    },
+    addComment: function (n) {
+      if (!this.need()) { return; }
+      var t = (this.draft[n.id] || '').trim(); if (!t) { return; }
+      var c = { id: uid(), by: this.meId, text: t, at: Date.now() };
+      this.notes = this.notes.map(function (x) { return x.id === n.id ? Object.assign({}, x, { comments: (x.comments || []).concat([c]) }) : x; });
+      this.draft[n.id] = '';
+      this.saveLocal();
+    },
+    delComment: function (n, c) {
+      this.notes = this.notes.map(function (x) {
+        return x.id === n.id ? Object.assign({}, x, { comments: (x.comments || []).filter(function (y) { return y.id !== c.id; }) }) : x;
+      });
+      this.saveLocal();
+    }
+  }
 }).mount('#app');
 </script>
 </body>
